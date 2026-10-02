@@ -20,13 +20,26 @@ public class SesionActual {
     /** Carga los permisos del rol del usuario logueado */
     public static void cargarPermisos(IConexionBD conexion) throws Exception {
         permisosPorPantalla.clear();
-        if (usuario == null) return;
-
+        
+        if (usuario == null) {
+            System.out.println(">>> [SesionActual] usuario es null");
+            return;
+        }
+        
+        System.out.println(">>> [SesionActual] Cargando permisos para RolID: " + usuario.getRolID());
+        
         PermisoRepositorio repo = new PermisoRepositorio(conexion);
         List<Permiso> lista = repo.obtenerPorRol(usuario.getRolID());
+        
+        System.out.println(">>> [SesionActual] Permisos encontrados en BD: " + lista.size());
+        
         for (Permiso p : lista) {
+            System.out.println(">>> [SesionActual]   PantallaID=" + p.getPantallaID() 
+                + " leer=" + p.isPermiteLeer());
             permisosPorPantalla.put(p.getPantallaID(), p);
         }
+        
+        System.out.println(">>> [SesionActual] Total en mapa: " + permisosPorPantalla.size());
     }
 
     /** Devuelve el permiso para una pantalla, o null si no tiene acceso */
