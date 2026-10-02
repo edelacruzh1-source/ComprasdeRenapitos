@@ -24,7 +24,6 @@ public class LoginPanel extends JPanel {
         setLayout(new GridBagLayout());
         setBackground(new Color(240, 242, 245));
 
-        // Tarjeta central
         JPanel tarjeta = new JPanel();
         tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
         tarjeta.setBackground(Color.WHITE);
@@ -34,19 +33,16 @@ public class LoginPanel extends JPanel {
         ));
         tarjeta.setPreferredSize(new Dimension(380, 320));
 
-        // Título
         JLabel lblTitulo = new JLabel("INICIAR SESIÓN");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitulo.setForeground(new Color(33, 37, 41));
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Subtítulo
         JLabel lblSubtitulo = new JLabel("Sistema de Adquisiciones");
         lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSubtitulo.setForeground(new Color(108, 117, 125));
         lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Campo Usuario
         JLabel lblUsuario = new JLabel("Usuario");
         lblUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblUsuario.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -59,7 +55,6 @@ public class LoginPanel extends JPanel {
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
-        // Campo Contraseña
         JLabel lblPassword = new JLabel("Contraseña");
         lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -72,7 +67,6 @@ public class LoginPanel extends JPanel {
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
-        // Botón
         JButton btnIngresar = new JButton("INGRESAR");
         btnIngresar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnIngresar.setForeground(Color.WHITE);
@@ -84,7 +78,9 @@ public class LoginPanel extends JPanel {
         btnIngresar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnIngresar.addActionListener(e -> autenticar());
 
-        // Armar tarjeta
+        // Enter en contraseña dispara login
+        txtPassword.addActionListener(e -> autenticar());
+
         tarjeta.add(lblTitulo);
         tarjeta.add(Box.createVerticalStrut(5));
         tarjeta.add(lblSubtitulo);
@@ -100,8 +96,6 @@ public class LoginPanel extends JPanel {
         tarjeta.add(btnIngresar);
 
         add(tarjeta);
-
-       
     }
 
     private void autenticar() {
@@ -128,11 +122,15 @@ public class LoginPanel extends JPanel {
                 return;
             }
 
-            // Guardar usuario y cargar permisos
+            // Guardar usuario y cargar permisos ANTES de mostrar el menú
             SesionActual.setUsuario(u);
-            SesionActual.cargarPermisos(conexion);  // ← NUEVO
+            SesionActual.cargarPermisos(conexion);
 
-            // Cambiar al menú principal
+            // Limpiar campos para el próximo login
+            txtUsuario.setText("");
+            txtPassword.setText("");
+
+            // Mostrar el menú (se construye AHORA con los permisos cargados)
             frame.mostrarPanel("menu");
 
         } catch (Exception ex) {

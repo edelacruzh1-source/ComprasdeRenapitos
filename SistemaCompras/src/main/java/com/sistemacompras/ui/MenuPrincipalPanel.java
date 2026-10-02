@@ -22,7 +22,7 @@ public class MenuPrincipalPanel extends JPanel {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // Barra superior
+        // ===== Barra superior =====
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(33, 37, 41));
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -38,14 +38,14 @@ public class MenuPrincipalPanel extends JPanel {
         topBar.add(lblTitulo, BorderLayout.WEST);
         topBar.add(lblUsuario, BorderLayout.EAST);
 
-        // Menú lateral
+        // ===== Menú lateral =====
         JPanel menuLateral = new JPanel();
         menuLateral.setLayout(new BoxLayout(menuLateral, BoxLayout.Y_AXIS));
         menuLateral.setBackground(new Color(52, 58, 64));
-        menuLateral.setPreferredSize(new Dimension(200, 0));
+        menuLateral.setPreferredSize(new Dimension(220, 0));
         menuLateral.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // ===== Botones según permisos =====
+        // Botones del menú según permisos
         agregarBotonMenu(menuLateral, "Inicio", () -> mostrarInicio());
 
         if (SesionActual.puedeLeer(Pantallas.SUCURSALES)) {
@@ -76,14 +76,16 @@ public class MenuPrincipalPanel extends JPanel {
         menuLateral.add(Box.createVerticalGlue());
         agregarBotonMenu(menuLateral, "Cerrar Sesión", this::cerrarSesion);
 
-        // Contenido central
+        // ===== Contenido central =====
         contenido.setBackground(new Color(248, 249, 250));
         mostrarInicio();
 
+        // ===== Armar layout =====
         add(topBar, BorderLayout.NORTH);
         add(menuLateral, BorderLayout.WEST);
         add(contenido, BorderLayout.CENTER);
 
+        // Info del usuario
         Usuario u = SesionActual.getUsuario();
         if (u != null) {
             lblUsuario.setText(u.getNombreUsuario() + "  |  " + u.getNombreRol());
@@ -102,7 +104,6 @@ public class MenuPrincipalPanel extends JPanel {
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boton.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        // Hover
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 boton.setBackground(new Color(73, 80, 87));
@@ -164,17 +165,26 @@ public class MenuPrincipalPanel extends JPanel {
     private void abrirPanel(String nombre) {
         contenido.removeAll();
 
-        JPanel panel = switch (nombre) {
-            case "sucursales" -> new SucursalPanel(conexion);
-            case "departamentos" -> new DepartamentoPanel(conexion);
-            case "articulos" -> new ArticuloPanel(conexion);
-            case "proveedores" -> new ProveedorPanel(conexion);
-            case "pedidos" -> new PedidoInternoPanel(conexion);
-            case "ordenes" -> new OrdenCompraPanel(conexion);
-            case "adjudicaciones" -> new AdjudicacionPanel(conexion);
-            case "usuarios" -> new UsuarioPanel(conexion);
-            default -> new JPanel();
-        };
+        JPanel panel;
+        try {
+            panel = switch (nombre) {
+                case "sucursales" -> new SucursalPanel(conexion);
+                case "departamentos" -> new DepartamentoPanel(conexion);
+                case "articulos" -> new ArticuloPanel(conexion);
+                case "proveedores" -> new ProveedorPanel(conexion);
+                case "pedidos" -> new PedidoInternoPanel(conexion);
+                case "ordenes" -> new OrdenCompraPanel(conexion);
+                case "adjudicaciones" -> new AdjudicacionPanel(conexion);
+                case "usuarios" -> new UsuarioPanel(conexion);
+                default -> new JPanel();
+            };
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Error al abrir panel: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return;
+        }
 
         contenido.add(panel, BorderLayout.CENTER);
         contenido.revalidate();
@@ -187,7 +197,8 @@ public class MenuPrincipalPanel extends JPanel {
             JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             SesionActual.cerrarSesion();
-            frame.mostrarPanel("login");
+            frame.reiniciarMenu();      // ← destruye el menú actual
+            frame.mostrarPanel("login"); // ← vuelve al login
         }
     }
 }
