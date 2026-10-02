@@ -1,6 +1,7 @@
 package com.sistemacompras.repositorios;
 import com.sistemacompras.datos.IConexionBD;
-import com.sistemacompras.entidades.Sucursal;
+import com.sistemacompras.entidades.Departamento;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +13,10 @@ public class DepartamentoRepositorio {
 		this.conexion = conexion;
 	}
 	
-	public List<Sucursal> obtenerTodos() throws Exception{
-		List<Sucursal> lista = new ArrayList<>();
-		String sql = "SELECT SucursalID, Codigo, Direccion, Ciudad, Departamento FROM Sucursal";
+	public List<Departamento> obtenerTodos() throws Exception{
+		List<Departamento> lista = new ArrayList<>();
+		String sql = "SELECT * FROM Departamento ORDER BY id_departamento";
+		
 		try (Connection conn= conexion.crearConexion();
 				PreparedStatement ps = conn.prepareStatement(sql);
 				ResultSet rs = ps. executeQuery()){
@@ -26,30 +28,30 @@ public class DepartamentoRepositorio {
 		
 	}
 	
-	public Sucursal obtenerPorId(int id) throws Exception{
-		String sql = "SELECT Sucursal ID, Codigo, Direccion, Ciudad, Departamento" +
-					 "FROM sucursal WHERE SucursalID=?";
-		try (Connection conn=conexion.crearConexion();
-				PreparedStatement ps=conn.prepareStatement(sql)
-				){
-			ps.setInt(1, id);
-			try(ResultSet rs=ps.executeQuery()){
-				if(rs.next()) return mapear(rs);
+	public List<Departamento> obtenerPorSucursal(int idSucursal) throws Exception{
+		List<Departamento> lista = new ArrayList<>();
+		String sql = "SELECT * FROM Departamento WHERE id_sucursal = ? ORDER BY nombre";
+		
+		try (Connection conn= conexion.crearConexion();
+				PreparedStatement ps = conn.prepareStatement(sql)){
+			ps.setInt(1, idSucursal);
+			try (ResultSet rs = ps.executeQuery()){
+				while(rs.next()) {
+					lista.add(mapear(rs));
+				}
 			}
+			}
+			return lista;
 		}
-		return null;
-	}
+				
 	
-	public int insertar(Sucursal s) throws Exception {
-		String sql="INSERT INTO Sucursal (Codigo, Direccion, Ciudad, Departamento)" +
-					"VALUES (?,?,?,?)";
+	public int insertar(Departamento d) throws Exception {
+		String sql="INSERT INTO Departamento (id_sucursal, nombre, descripcion) VALUES (?, ?, ?)";
 		try (Connection conn=conexion.crearConexion();
-				PreparedStatement ps=conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-				){
-			ps.setString(1, s.getCodigo());
-			ps.setString(2, s.getDireccion());
-			ps.setString(3, s.getCiudad());
-			ps.setString(4, s.getDepartamento());
+				PreparedStatement ps=conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+			ps.setInt(1, d.getSucursalID());
+			ps.setString(2, d.getNombre());
+			ps.setString(3, d.getDescripcion());
 			ps.executeUpdate();
 			
 			try(ResultSet rs=ps.getGeneratedKeys()){
@@ -58,22 +60,22 @@ public class DepartamentoRepositorio {
 		}
 		return 0;
 	}
-	public boolean actualizar(Sucursal s) throws Exception {
-        String sql = "UPDATE Sucursal SET Codigo=?, Direccion=?, Ciudad=?, Departamento=? " +
-                     "WHERE SucursalID=?";
+	
+	public boolean actualizar(Departamento d) throws Exception {
+        String sql = "UPDATE Departamento SET id_sucursal=?, nombre=?, descripcion=? WHERE id_departamento=?";
 
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, s.getCodigo());
-            ps.setString(2, s.getDireccion());
-            ps.setString(3, s.getCiudad());
-            ps.setString(4, s.getDepartamento());
-            ps.setInt(5, s.getSucursalID());
+            ps.setInt(1, d.getSucursalID());
+            ps.setString(2, d.getNombre());
+            ps.setString(3, d.getDescripcion());
+            ps.setInt(4, d.getDepartamentoID());
             return ps.executeUpdate() > 0;
         }
     }
+	
 	public boolean eliminar(int id) throws Exception {
-        String sql = "DELETE FROM Sucursal WHERE SucursalID = ?";
+        String sql = "DELETE FROM Departamento WHERE id_departamento = ?";
 
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -82,13 +84,12 @@ public class DepartamentoRepositorio {
         }
     }
 	
-	private Sucursal mapear(ResultSet rs) throws SQLException{
-		return new Sucursal(
-				rs.getInt("SucursalID"),
-				rs.getString("Codigo"),
-				rs.getString("Direccion"),
-				rs.getString("Ciudad"),
-				rs.getString("Departamento")
+	private Departamento mapear(ResultSet rs) throws SQLException {
+		return new Departamento(
+				rs.getInt("id_departamento"),
+				rs.getInt("id_sucursal"),
+				rs.getString("nombre"),
+				rs.getString("descripcion")
 				);
 				
 	}

@@ -27,7 +27,7 @@ public class SucursalRepositorio {
 	}
 	
 	public Sucursal obtenerPorId(int id) throws Exception{
-		String sql = "SELECT Sucursal ID, Codigo, Direccion, Ciudad, Departamento" +
+		String sql = "SELECT SucursalID, Codigo, Direccion, Ciudad, Departamento" +
 					 "FROM sucursal WHERE SucursalID=?";
 		try (Connection conn=conexion.crearConexion();
 				PreparedStatement ps=conn.prepareStatement(sql)
