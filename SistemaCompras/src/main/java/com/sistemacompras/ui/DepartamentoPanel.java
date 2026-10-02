@@ -15,12 +15,12 @@ public class DepartamentoPanel extends JPanel {
 
     private final DepartamentoRepositorio repo;
     private final SucursalRepositorio sucursalRepo;
-
     private JTable tabla;
     private DefaultTableModel modelo;
     private JComboBox<Sucursal> cboSucursal;
     private JTextField txtNombre, txtDescripcion;
     private int idSeleccionado = 0;
+    private final int pantallaID = Pantallas.DEPARTAMENTOS;
 
     public DepartamentoPanel(IConexionBD conexion) {
         this.repo = new DepartamentoRepositorio(conexion);
@@ -40,7 +40,6 @@ public class DepartamentoPanel extends JPanel {
         lblTitulo.setForeground(new Color(33, 37, 41));
         add(lblTitulo, BorderLayout.NORTH);
 
-        // Tabla
         modelo = new DefaultTableModel(
             new Object[]{"ID", "Nombre", "Descripción", "Sucursal"}, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -57,7 +56,6 @@ public class DepartamentoPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
 
-        // Formulario
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createCompoundBorder(
@@ -91,7 +89,6 @@ public class DepartamentoPanel extends JPanel {
         txtDescripcion = new JTextField(30);
         form.add(txtDescripcion, gbc);
 
-        // Botones
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         botones.setBackground(Color.WHITE);
 
@@ -103,9 +100,19 @@ public class DepartamentoPanel extends JPanel {
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
 
-        botones.add(btnNuevo);
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
+        if (SesionActual.puedeCrear(pantallaID) || SesionActual.puedeActualizar(pantallaID)) {
+            botones.add(btnNuevo);
+            botones.add(btnGuardar);
+        }
+        if (SesionActual.puedeBorrar(pantallaID)) {
+            botones.add(btnEliminar);
+        }
+
+        boolean puedeEditar = SesionActual.puedeCrear(pantallaID) 
+                           || SesionActual.puedeActualizar(pantallaID);
+        cboSucursal.setEnabled(puedeEditar);
+        txtNombre.setEnabled(puedeEditar);
+        txtDescripcion.setEnabled(puedeEditar);
 
         JPanel inferior = new JPanel(new BorderLayout(10, 10));
         inferior.setBackground(new Color(248, 249, 250));
@@ -133,9 +140,7 @@ public class DepartamentoPanel extends JPanel {
     private void cargarSucursales() {
         try {
             cboSucursal.removeAllItems();
-            for (Sucursal s : sucursalRepo.obtenerTodos()) {
-                cboSucursal.addItem(s);
-            }
+            for (Sucursal s : sucursalRepo.obtenerTodos()) cboSucursal.addItem(s);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error cargando sucursales: " + e.getMessage());
         }
@@ -146,13 +151,12 @@ public class DepartamentoPanel extends JPanel {
             modelo.setRowCount(0);
             List<Sucursal> sucursales = sucursalRepo.obtenerTodos();
             for (Departamento d : repo.obtenerTodos()) {
-                String nombreSucursal = sucursales.stream()
+                String nombreSuc = sucursales.stream()
                     .filter(s -> s.getSucursalID() == d.getSucursalID())
-                    .map(Sucursal::getCodigo)
-                    .findFirst().orElse("?");
+                    .map(Sucursal::getCodigo).findFirst().orElse("?");
                 modelo.addRow(new Object[]{
                     d.getDepartamentoID(), d.getNombre(),
-                    d.getDescripcion(), nombreSucursal
+                    d.getDescripcion(), nombreSuc
                 });
             }
         } catch (Exception e) {
@@ -170,11 +174,9 @@ public class DepartamentoPanel extends JPanel {
 
             txtNombre.setText(d.getNombre());
             txtDescripcion.setText(d.getDescripcion());
-
             for (int i = 0; i < cboSucursal.getItemCount(); i++) {
                 if (cboSucursal.getItemAt(i).getSucursalID() == d.getSucursalID()) {
-                    cboSucursal.setSelectedIndex(i);
-                    break;
+                    cboSucursal.setSelectedIndex(i); break;
                 }
             }
         } catch (Exception e) {
@@ -183,6 +185,10 @@ public class DepartamentoPanel extends JPanel {
     }
 
     private void guardar() {
+        if (!SesionActual.puedeCrear(pantallaID) && !SesionActual.puedeActualizar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "No tienes permiso para esta acción");
+            return;
+        }
         try {
             Sucursal suc = (Sucursal) cboSucursal.getSelectedItem();
             if (suc == null) {
@@ -191,15 +197,11 @@ public class DepartamentoPanel extends JPanel {
             }
             String nombre = txtNombre.getText().trim();
             String desc = txtDescripcion.getText().trim();
-
             if (nombre.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El nombre es obligatorio",
-                    "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "El nombre es obligatorio");
                 return;
             }
-
             Departamento d = new Departamento(idSeleccionado, suc.getSucursalID(), nombre, desc);
-
             if (idSeleccionado == 0) {
                 repo.insertar(d);
                 JOptionPane.showMessageDialog(this, "Departamento creado");
@@ -207,25 +209,24 @@ public class DepartamentoPanel extends JPanel {
                 repo.actualizar(d);
                 JOptionPane.showMessageDialog(this, "Departamento actualizado");
             }
-
             limpiar();
             cargarTabla();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
     private void eliminar() {
+        if (!SesionActual.puedeBorrar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "No tienes permiso para eliminar");
+            return;
+        }
         if (idSeleccionado == 0) {
             JOptionPane.showMessageDialog(this, "Selecciona un departamento");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar el departamento seleccionado?", "Confirmar",
-            JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
+        if (JOptionPane.showConfirmDialog(this, "¿Eliminar?", "Confirmar",
+            JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
         try {
             repo.eliminar(idSeleccionado);
             JOptionPane.showMessageDialog(this, "Departamento eliminado");
@@ -242,6 +243,5 @@ public class DepartamentoPanel extends JPanel {
         txtDescripcion.setText("");
         if (cboSucursal.getItemCount() > 0) cboSucursal.setSelectedIndex(0);
         tabla.clearSelection();
-        txtNombre.requestFocus();
     }
 }

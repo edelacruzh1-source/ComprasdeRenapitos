@@ -20,13 +20,13 @@ public class PedidoInternoPanel extends JPanel {
     private final PedidoInternoRepositorio repo;
     private final DepartamentoRepositorio deptoRepo;
     private final ArticuloRepositorio articuloRepo;
-
     private JTable tabla;
     private DefaultTableModel modelo;
     private JComboBox<Departamento> cboDepartamento;
     private JComboBox<Articulo> cboArticulo;
     private JTextField txtCantidad, txtFechaSolicitud, txtFechaNecesidad;
     private int idSeleccionado = 0;
+    private final int pantallaID = Pantallas.PEDIDOS;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -46,7 +46,6 @@ public class PedidoInternoPanel extends JPanel {
 
         JLabel lblTitulo = new JLabel("Gestión de Pedidos Internos");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTitulo.setForeground(new Color(33, 37, 41));
         add(lblTitulo, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel(
@@ -56,22 +55,17 @@ public class PedidoInternoPanel extends JPanel {
         };
         tabla = new JTable(modelo);
         tabla.setRowHeight(28);
-        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tabla.getTableHeader().setBackground(new Color(233, 236, 239));
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) seleccionarFila();
         });
 
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(222, 226, 230)),
-                "Datos del Pedido"),
+            BorderFactory.createTitledBorder("Datos del Pedido"),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
@@ -125,9 +119,21 @@ public class PedidoInternoPanel extends JPanel {
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
 
-        botones.add(btnNuevo);
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
+        if (SesionActual.puedeCrear(pantallaID) || SesionActual.puedeActualizar(pantallaID)) {
+            botones.add(btnNuevo);
+            botones.add(btnGuardar);
+        }
+        if (SesionActual.puedeBorrar(pantallaID)) {
+            botones.add(btnEliminar);
+        }
+
+        boolean puedeEditar = SesionActual.puedeCrear(pantallaID) 
+                           || SesionActual.puedeActualizar(pantallaID);
+        cboDepartamento.setEnabled(puedeEditar);
+        cboArticulo.setEnabled(puedeEditar);
+        txtCantidad.setEnabled(puedeEditar);
+        txtFechaSolicitud.setEnabled(puedeEditar);
+        txtFechaNecesidad.setEnabled(puedeEditar);
 
         JPanel inferior = new JPanel(new BorderLayout(10, 10));
         inferior.setBackground(new Color(248, 249, 250));
@@ -155,13 +161,9 @@ public class PedidoInternoPanel extends JPanel {
     private void cargarCombos() {
         try {
             cboDepartamento.removeAllItems();
-            for (Departamento d : deptoRepo.obtenerTodos()) {
-                cboDepartamento.addItem(d);
-            }
+            for (Departamento d : deptoRepo.obtenerTodos()) cboDepartamento.addItem(d);
             cboArticulo.removeAllItems();
-            for (Articulo a : articuloRepo.obtenerTodos()) {
-                cboArticulo.addItem(a);
-            }
+            for (Articulo a : articuloRepo.obtenerTodos()) cboArticulo.addItem(a);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error cargando combos: " + e.getMessage());
         }
@@ -220,23 +222,24 @@ public class PedidoInternoPanel extends JPanel {
     }
 
     private void guardar() {
+        if (!SesionActual.puedeCrear(pantallaID) && !SesionActual.puedeActualizar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso");
+            return;
+        }
         try {
             Departamento depto = (Departamento) cboDepartamento.getSelectedItem();
             Articulo art = (Articulo) cboArticulo.getSelectedItem();
-
             if (depto == null || art == null) {
                 JOptionPane.showMessageDialog(this, "Selecciona departamento y artículo");
                 return;
             }
-
             int cantidad = Integer.parseInt(txtCantidad.getText().trim());
             LocalDate fSol = LocalDate.parse(txtFechaSolicitud.getText().trim(), FMT);
             LocalDate fNec = LocalDate.parse(txtFechaNecesidad.getText().trim(), FMT);
 
             if (fNec.isBefore(fSol)) {
                 JOptionPane.showMessageDialog(this,
-                    "La fecha de necesidad no puede ser anterior a la solicitud",
-                    "Validación", JOptionPane.WARNING_MESSAGE);
+                    "F. necesidad no puede ser anterior a F. solicitud");
                 return;
             }
 
@@ -251,28 +254,23 @@ public class PedidoInternoPanel extends JPanel {
                 repo.actualizar(p);
                 JOptionPane.showMessageDialog(this, "Pedido actualizado");
             }
-
             limpiar();
             cargarTabla();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "La cantidad debe ser un número",
-                "Validación", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "La cantidad debe ser un número");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
     private void eliminar() {
-        if (idSeleccionado == 0) {
-            JOptionPane.showMessageDialog(this, "Selecciona un pedido");
+        if (!SesionActual.puedeBorrar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso para eliminar");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar el pedido seleccionado?", "Confirmar",
-            JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
+        if (idSeleccionado == 0) return;
+        if (JOptionPane.showConfirmDialog(this, "¿Eliminar?", "Confirmar",
+            JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
         try {
             repo.eliminar(idSeleccionado);
             JOptionPane.showMessageDialog(this, "Pedido eliminado");

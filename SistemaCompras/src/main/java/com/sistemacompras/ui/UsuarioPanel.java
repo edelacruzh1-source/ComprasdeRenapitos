@@ -14,7 +14,6 @@ public class UsuarioPanel extends JPanel {
 
     private final UsuarioService service;
     private final RolRepositorio rolRepo;
-
     private JTable tabla;
     private DefaultTableModel modelo;
     private JTextField txtUsuario;
@@ -23,6 +22,7 @@ public class UsuarioPanel extends JPanel {
     private JCheckBox chkActivo;
     private JLabel lblHint;
     private int idSeleccionado = 0;
+    private final int pantallaID = Pantallas.USUARIOS;
 
     public UsuarioPanel(IConexionBD conexion) {
         this.service = new UsuarioService(conexion);
@@ -39,32 +39,25 @@ public class UsuarioPanel extends JPanel {
 
         JLabel lblTitulo = new JLabel("Gestión de Usuarios");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTitulo.setForeground(new Color(33, 37, 41));
         add(lblTitulo, BorderLayout.NORTH);
 
-        // Tabla
         modelo = new DefaultTableModel(
             new Object[]{"ID", "Usuario", "Rol", "Activo"}, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         tabla = new JTable(modelo);
         tabla.setRowHeight(28);
-        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) seleccionarFila();
         });
 
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
 
-        // Formulario
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(222, 226, 230)),
-                "Datos del Usuario"),
+            BorderFactory.createTitledBorder("Datos del Usuario"),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
@@ -81,7 +74,7 @@ public class UsuarioPanel extends JPanel {
 
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
         form.add(new JLabel("Contraseña:"), gbc);
-        gbc.gridx = 1; gbc.gridwidth = 1;
+        gbc.gridx = 1;
         txtPassword = new JPasswordField(20);
         form.add(txtPassword, gbc);
 
@@ -106,7 +99,6 @@ public class UsuarioPanel extends JPanel {
         chkActivo.setBackground(Color.WHITE);
         form.add(chkActivo, gbc);
 
-        // Botones
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         botones.setBackground(Color.WHITE);
 
@@ -118,17 +110,27 @@ public class UsuarioPanel extends JPanel {
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
 
-        botones.add(btnNuevo);
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
+        if (SesionActual.puedeCrear(pantallaID) || SesionActual.puedeActualizar(pantallaID)) {
+            botones.add(btnNuevo);
+            botones.add(btnGuardar);
+        }
+        if (SesionActual.puedeBorrar(pantallaID)) {
+            botones.add(btnEliminar);
+        }
+
+        boolean puedeEditar = SesionActual.puedeCrear(pantallaID) 
+                           || SesionActual.puedeActualizar(pantallaID);
+        txtUsuario.setEnabled(puedeEditar);
+        txtPassword.setEnabled(puedeEditar);
+        cboRol.setEnabled(puedeEditar);
+        chkActivo.setEnabled(puedeEditar);
 
         JPanel inferior = new JPanel(new BorderLayout(10, 10));
         inferior.setBackground(new Color(248, 249, 250));
         inferior.add(form, BorderLayout.CENTER);
         inferior.add(botones, BorderLayout.SOUTH);
 
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-            scroll, inferior);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scroll, inferior);
         split.setResizeWeight(0.5);
         split.setBorder(null);
         add(split, BorderLayout.CENTER);
@@ -149,9 +151,7 @@ public class UsuarioPanel extends JPanel {
     private void cargarRoles() {
         try {
             cboRol.removeAllItems();
-            for (Rol r : rolRepo.obtenerTodos()) {
-                cboRol.addItem(r);
-            }
+            for (Rol r : rolRepo.obtenerTodos()) cboRol.addItem(r);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error cargando roles: " + e.getMessage());
         }
@@ -162,10 +162,8 @@ public class UsuarioPanel extends JPanel {
             modelo.setRowCount(0);
             for (Usuario u : service.obtenerTodos()) {
                 modelo.addRow(new Object[]{
-                    u.getUsuarioID(),
-                    u.getNombreUsuario(),
-                    u.getNombreRol(),
-                    u.isActivo() ? "Sí" : "No"
+                    u.getUsuarioID(), u.getNombreUsuario(),
+                    u.getNombreRol(), u.isActivo() ? "Sí" : "No"
                 });
             }
         } catch (Exception e) {
@@ -187,8 +185,7 @@ public class UsuarioPanel extends JPanel {
 
             for (int i = 0; i < cboRol.getItemCount(); i++) {
                 if (cboRol.getItemAt(i).getRolID() == u.getRolID()) {
-                    cboRol.setSelectedIndex(i);
-                    break;
+                    cboRol.setSelectedIndex(i); break;
                 }
             }
             lblHint.setText("(dejar vacío para no cambiar)");
@@ -198,47 +195,44 @@ public class UsuarioPanel extends JPanel {
     }
 
     private void guardar() {
+        if (!SesionActual.puedeCrear(pantallaID) && !SesionActual.puedeActualizar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso");
+            return;
+        }
         try {
             String usuario = txtUsuario.getText().trim();
             String password = new String(txtPassword.getPassword());
             Rol rol = (Rol) cboRol.getSelectedItem();
-
             if (rol == null) {
                 JOptionPane.showMessageDialog(this, "Selecciona un rol");
                 return;
             }
-
             if (idSeleccionado == 0) {
                 service.crear(usuario, password, rol.getRolID(), chkActivo.isSelected());
-                JOptionPane.showMessageDialog(this,
-                    "Usuario creado\nEl hash de la contraseña se generó automáticamente");
+                JOptionPane.showMessageDialog(this, "Usuario creado (hash generado)");
             } else {
                 service.actualizar(idSeleccionado, usuario, password,
-                                   rol.getRolID(), chkActivo.isSelected());
+                    rol.getRolID(), chkActivo.isSelected());
                 JOptionPane.showMessageDialog(this, "Usuario actualizado");
             }
-
             limpiar();
             cargarTabla();
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Validación",
                 JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 
     private void eliminar() {
-        if (idSeleccionado == 0) {
-            JOptionPane.showMessageDialog(this, "Selecciona un usuario");
+        if (!SesionActual.puedeBorrar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso para eliminar");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar el usuario seleccionado?", "Confirmar",
-            JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
+        if (idSeleccionado == 0) return;
+        if (JOptionPane.showConfirmDialog(this, "¿Eliminar?", "Confirmar",
+            JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
         try {
             service.eliminar(idSeleccionado);
             JOptionPane.showMessageDialog(this, "Usuario eliminado");

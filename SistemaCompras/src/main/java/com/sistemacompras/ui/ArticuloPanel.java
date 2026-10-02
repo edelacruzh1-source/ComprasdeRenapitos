@@ -15,6 +15,7 @@ public class ArticuloPanel extends JPanel {
     private DefaultTableModel modelo;
     private JTextField txtCodigo, txtNombre, txtDescripcion;
     private int idSeleccionado = 0;
+    private final int pantallaID = Pantallas.ARTICULOS;
 
     public ArticuloPanel(IConexionBD conexion) {
         this.repo = new ArticuloRepositorio(conexion);
@@ -29,7 +30,6 @@ public class ArticuloPanel extends JPanel {
 
         JLabel lblTitulo = new JLabel("Gestión de Artículos");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTitulo.setForeground(new Color(33, 37, 41));
         add(lblTitulo, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel(
@@ -38,22 +38,17 @@ public class ArticuloPanel extends JPanel {
         };
         tabla = new JTable(modelo);
         tabla.setRowHeight(28);
-        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tabla.getTableHeader().setBackground(new Color(233, 236, 239));
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) seleccionarFila();
         });
 
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(222, 226, 230)),
-                "Datos del Artículo"),
+            BorderFactory.createTitledBorder("Datos del Artículo"),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
@@ -91,9 +86,19 @@ public class ArticuloPanel extends JPanel {
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
 
-        botones.add(btnNuevo);
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
+        if (SesionActual.puedeCrear(pantallaID) || SesionActual.puedeActualizar(pantallaID)) {
+            botones.add(btnNuevo);
+            botones.add(btnGuardar);
+        }
+        if (SesionActual.puedeBorrar(pantallaID)) {
+            botones.add(btnEliminar);
+        }
+
+        boolean puedeEditar = SesionActual.puedeCrear(pantallaID) 
+                           || SesionActual.puedeActualizar(pantallaID);
+        txtCodigo.setEnabled(puedeEditar);
+        txtNombre.setEnabled(puedeEditar);
+        txtDescripcion.setEnabled(puedeEditar);
 
         JPanel inferior = new JPanel(new BorderLayout(10, 10));
         inferior.setBackground(new Color(248, 249, 250));
@@ -142,19 +147,19 @@ public class ArticuloPanel extends JPanel {
     }
 
     private void guardar() {
+        if (!SesionActual.puedeCrear(pantallaID) && !SesionActual.puedeActualizar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "No tienes permiso");
+            return;
+        }
         try {
             String codigo = txtCodigo.getText().trim();
             String nombre = txtNombre.getText().trim();
             String desc = txtDescripcion.getText().trim();
-
             if (codigo.isEmpty() || nombre.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Código y nombre son obligatorios",
-                    "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Código y nombre obligatorios");
                 return;
             }
-
             Articulo a = new Articulo(idSeleccionado, codigo, nombre, desc);
-
             if (idSeleccionado == 0) {
                 repo.insertar(a);
                 JOptionPane.showMessageDialog(this, "Artículo creado");
@@ -162,25 +167,21 @@ public class ArticuloPanel extends JPanel {
                 repo.actualizar(a);
                 JOptionPane.showMessageDialog(this, "Artículo actualizado");
             }
-
             limpiar();
             cargarTabla();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
     private void eliminar() {
-        if (idSeleccionado == 0) {
-            JOptionPane.showMessageDialog(this, "Selecciona un artículo");
+        if (!SesionActual.puedeBorrar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso para eliminar");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar el artículo seleccionado?", "Confirmar",
-            JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
+        if (idSeleccionado == 0) return;
+        if (JOptionPane.showConfirmDialog(this, "¿Eliminar?", "Confirmar",
+            JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
         try {
             repo.eliminar(idSeleccionado);
             JOptionPane.showMessageDialog(this, "Artículo eliminado");
@@ -197,6 +198,5 @@ public class ArticuloPanel extends JPanel {
         txtNombre.setText("");
         txtDescripcion.setText("");
         tabla.clearSelection();
-        txtCodigo.requestFocus();
     }
 }

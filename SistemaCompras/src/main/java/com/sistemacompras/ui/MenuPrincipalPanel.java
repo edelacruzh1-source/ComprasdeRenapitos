@@ -22,7 +22,7 @@ public class MenuPrincipalPanel extends JPanel {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // ===== Barra superior =====
+        // Barra superior
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(33, 37, 41));
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -38,34 +38,52 @@ public class MenuPrincipalPanel extends JPanel {
         topBar.add(lblTitulo, BorderLayout.WEST);
         topBar.add(lblUsuario, BorderLayout.EAST);
 
-        // ===== Menú lateral =====
+        // Menú lateral
         JPanel menuLateral = new JPanel();
         menuLateral.setLayout(new BoxLayout(menuLateral, BoxLayout.Y_AXIS));
         menuLateral.setBackground(new Color(52, 58, 64));
         menuLateral.setPreferredSize(new Dimension(200, 0));
         menuLateral.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // Botones del menú
+        // ===== Botones según permisos =====
         agregarBotonMenu(menuLateral, "Inicio", () -> mostrarInicio());
-        agregarBotonMenu(menuLateral, "Sucursales", () -> abrirPanel("sucursales"));
-        agregarBotonMenu(menuLateral, "Departamentos", () -> abrirPanel("departamentos"));
-        agregarBotonMenu(menuLateral, "Artículos", () -> abrirPanel("articulos"));
-        agregarBotonMenu(menuLateral, "Proveedores", () -> abrirPanel("proveedores"));
-        agregarBotonMenu(menuLateral, "Usuarios", () -> abrirPanel("usuarios"));
+
+        if (SesionActual.puedeLeer(Pantallas.SUCURSALES)) {
+            agregarBotonMenu(menuLateral, "Sucursales", () -> abrirPanel("sucursales"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.DEPARTAMENTOS)) {
+            agregarBotonMenu(menuLateral, "Departamentos", () -> abrirPanel("departamentos"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.ARTICULOS)) {
+            agregarBotonMenu(menuLateral, "Artículos", () -> abrirPanel("articulos"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.PROVEEDORES)) {
+            agregarBotonMenu(menuLateral, "Proveedores", () -> abrirPanel("proveedores"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.PEDIDOS)) {
+            agregarBotonMenu(menuLateral, "Pedidos Internos", () -> abrirPanel("pedidos"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.ORDENES)) {
+            agregarBotonMenu(menuLateral, "Órdenes de Compra", () -> abrirPanel("ordenes"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.ADJUDICACIONES)) {
+            agregarBotonMenu(menuLateral, "Adjudicaciones", () -> abrirPanel("adjudicaciones"));
+        }
+        if (SesionActual.puedeLeer(Pantallas.USUARIOS)) {
+            agregarBotonMenu(menuLateral, "Usuarios", () -> abrirPanel("usuarios"));
+        }
 
         menuLateral.add(Box.createVerticalGlue());
         agregarBotonMenu(menuLateral, "Cerrar Sesión", this::cerrarSesion);
 
-        // ===== Contenido central =====
+        // Contenido central
         contenido.setBackground(new Color(248, 249, 250));
         mostrarInicio();
 
-        // Armar layout
         add(topBar, BorderLayout.NORTH);
         add(menuLateral, BorderLayout.WEST);
         add(contenido, BorderLayout.CENTER);
 
-        // Actualizar nombre de usuario
         Usuario u = SesionActual.getUsuario();
         if (u != null) {
             lblUsuario.setText(u.getNombreUsuario() + "  |  " + u.getNombreRol());
@@ -151,6 +169,9 @@ public class MenuPrincipalPanel extends JPanel {
             case "departamentos" -> new DepartamentoPanel(conexion);
             case "articulos" -> new ArticuloPanel(conexion);
             case "proveedores" -> new ProveedorPanel(conexion);
+            case "pedidos" -> new PedidoInternoPanel(conexion);
+            case "ordenes" -> new OrdenCompraPanel(conexion);
+            case "adjudicaciones" -> new AdjudicacionPanel(conexion);
             case "usuarios" -> new UsuarioPanel(conexion);
             default -> new JPanel();
         };

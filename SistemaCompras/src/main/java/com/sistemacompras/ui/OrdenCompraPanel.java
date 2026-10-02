@@ -18,6 +18,7 @@ public class OrdenCompraPanel extends JPanel {
     private JTextField txtDescripcion, txtFechaCreacion, txtFechaLimite;
     private JComboBox<String> cboTipo, cboSubtipo;
     private int idSeleccionado = 0;
+    private final int pantallaID = Pantallas.ORDENES;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -34,7 +35,6 @@ public class OrdenCompraPanel extends JPanel {
 
         JLabel lblTitulo = new JLabel("Gestión de Órdenes de Compra");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTitulo.setForeground(new Color(33, 37, 41));
         add(lblTitulo, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel(
@@ -43,22 +43,17 @@ public class OrdenCompraPanel extends JPanel {
         };
         tabla = new JTable(modelo);
         tabla.setRowHeight(28);
-        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tabla.getTableHeader().setBackground(new Color(233, 236, 239));
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) seleccionarFila();
         });
 
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(222, 226, 230)),
-                "Datos de la Orden"),
+            BorderFactory.createTitledBorder("Datos de la Orden"),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
@@ -113,9 +108,21 @@ public class OrdenCompraPanel extends JPanel {
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
 
-        botones.add(btnNuevo);
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
+        if (SesionActual.puedeCrear(pantallaID) || SesionActual.puedeActualizar(pantallaID)) {
+            botones.add(btnNuevo);
+            botones.add(btnGuardar);
+        }
+        if (SesionActual.puedeBorrar(pantallaID)) {
+            botones.add(btnEliminar);
+        }
+
+        boolean puedeEditar = SesionActual.puedeCrear(pantallaID) 
+                           || SesionActual.puedeActualizar(pantallaID);
+        txtDescripcion.setEnabled(puedeEditar);
+        txtFechaCreacion.setEnabled(puedeEditar);
+        txtFechaLimite.setEnabled(puedeEditar);
+        cboTipo.setEnabled(puedeEditar);
+        cboSubtipo.setEnabled(puedeEditar);
 
         JPanel inferior = new JPanel(new BorderLayout(10, 10));
         inferior.setBackground(new Color(248, 249, 250));
@@ -174,9 +181,7 @@ public class OrdenCompraPanel extends JPanel {
             txtFechaCreacion.setText(o.getFechaCreacion().format(FMT));
             txtFechaLimite.setText(o.getFechaLimite().format(FMT));
             cboTipo.setSelectedItem(o.getTipoOrden());
-            if (o.getSubtipoOrden() != null) {
-                cboSubtipo.setSelectedItem(o.getSubtipoOrden());
-            }
+            if (o.getSubtipoOrden() != null) cboSubtipo.setSelectedItem(o.getSubtipoOrden());
             actualizarSubtipo();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
@@ -184,15 +189,17 @@ public class OrdenCompraPanel extends JPanel {
     }
 
     private void guardar() {
+        if (!SesionActual.puedeCrear(pantallaID) && !SesionActual.puedeActualizar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso");
+            return;
+        }
         try {
             String desc = txtDescripcion.getText().trim();
             LocalDate fCre = LocalDate.parse(txtFechaCreacion.getText().trim(), FMT);
             LocalDate fLim = LocalDate.parse(txtFechaLimite.getText().trim(), FMT);
 
             if (fLim.isBefore(fCre)) {
-                JOptionPane.showMessageDialog(this,
-                    "La fecha límite no puede ser anterior a la creación",
-                    "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "F. límite no puede ser anterior a F. creación");
                 return;
             }
 
@@ -208,25 +215,21 @@ public class OrdenCompraPanel extends JPanel {
                 repo.actualizar(o);
                 JOptionPane.showMessageDialog(this, "Orden actualizada");
             }
-
             limpiar();
             cargarTabla();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
     private void eliminar() {
-        if (idSeleccionado == 0) {
-            JOptionPane.showMessageDialog(this, "Selecciona una orden");
+        if (!SesionActual.puedeBorrar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "Sin permiso para eliminar");
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar la orden seleccionada?", "Confirmar",
-            JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
+        if (idSeleccionado == 0) return;
+        if (JOptionPane.showConfirmDialog(this, "¿Eliminar?", "Confirmar",
+            JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
         try {
             repo.eliminar(idSeleccionado);
             JOptionPane.showMessageDialog(this, "Orden eliminada");

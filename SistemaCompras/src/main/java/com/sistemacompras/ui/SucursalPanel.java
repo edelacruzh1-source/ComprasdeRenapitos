@@ -7,7 +7,6 @@ import com.sistemacompras.repositorios.SucursalRepositorio;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
 public class SucursalPanel extends JPanel {
 
@@ -16,6 +15,7 @@ public class SucursalPanel extends JPanel {
     private DefaultTableModel modelo;
     private JTextField txtCodigo, txtDireccion, txtCiudad, txtDepartamento;
     private int idSeleccionado = 0;
+    private final int pantallaID = Pantallas.SUCURSALES;
 
     public SucursalPanel(IConexionBD conexion) {
         this.repo = new SucursalRepositorio(conexion);
@@ -28,13 +28,12 @@ public class SucursalPanel extends JPanel {
         setBackground(new Color(248, 249, 250));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // ===== Título =====
         JLabel lblTitulo = new JLabel("Gestión de Sucursales");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitulo.setForeground(new Color(33, 37, 41));
         add(lblTitulo, BorderLayout.NORTH);
 
-        // ===== Tabla =====
+        // Tabla
         modelo = new DefaultTableModel(
             new Object[]{"ID", "Código", "Dirección", "Ciudad", "Departamento"}, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -44,7 +43,6 @@ public class SucursalPanel extends JPanel {
         tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tabla.getTableHeader().setBackground(new Color(233, 236, 239));
-        tabla.setSelectionBackground(new Color(13, 110, 253, 80));
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) seleccionarFila();
         });
@@ -52,7 +50,7 @@ public class SucursalPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
 
-        // ===== Formulario =====
+        // Formulario
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createCompoundBorder(
@@ -67,7 +65,7 @@ public class SucursalPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         form.add(new JLabel("Código:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1;
         txtCodigo = new JTextField(15);
@@ -91,7 +89,7 @@ public class SucursalPanel extends JPanel {
         txtDepartamento = new JTextField(15);
         form.add(txtDepartamento, gbc);
 
-        // ===== Botones =====
+        // Botones con permisos
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         botones.setBackground(Color.WHITE);
 
@@ -103,19 +101,28 @@ public class SucursalPanel extends JPanel {
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
 
-        botones.add(btnNuevo);
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
+        if (SesionActual.puedeCrear(pantallaID) || SesionActual.puedeActualizar(pantallaID)) {
+            botones.add(btnNuevo);
+            botones.add(btnGuardar);
+        }
+        if (SesionActual.puedeBorrar(pantallaID)) {
+            botones.add(btnEliminar);
+        }
 
-        // ===== Panel inferior =====
+        // Deshabilitar campos si no puede editar
+        boolean puedeEditar = SesionActual.puedeCrear(pantallaID) 
+                           || SesionActual.puedeActualizar(pantallaID);
+        txtCodigo.setEnabled(puedeEditar);
+        txtDireccion.setEnabled(puedeEditar);
+        txtCiudad.setEnabled(puedeEditar);
+        txtDepartamento.setEnabled(puedeEditar);
+
         JPanel inferior = new JPanel(new BorderLayout(10, 10));
         inferior.setBackground(new Color(248, 249, 250));
         inferior.add(form, BorderLayout.CENTER);
         inferior.add(botones, BorderLayout.SOUTH);
 
-        // ===== Armar =====
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-            scroll, inferior);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scroll, inferior);
         split.setResizeWeight(0.6);
         split.setBorder(null);
         add(split, BorderLayout.CENTER);
@@ -138,11 +145,8 @@ public class SucursalPanel extends JPanel {
             modelo.setRowCount(0);
             for (Sucursal s : repo.obtenerTodos()) {
                 modelo.addRow(new Object[]{
-                    s.getSucursalID(),
-                    s.getCodigo(),
-                    s.getDireccion(),
-                    s.getCiudad(),
-                    s.getDepartamento()
+                    s.getSucursalID(), s.getCodigo(), s.getDireccion(),
+                    s.getCiudad(), s.getDepartamento()
                 });
             }
         } catch (Exception e) {
@@ -153,7 +157,6 @@ public class SucursalPanel extends JPanel {
     private void seleccionarFila() {
         int fila = tabla.getSelectedRow();
         if (fila < 0) return;
-
         idSeleccionado = (int) modelo.getValueAt(fila, 0);
         txtCodigo.setText((String) modelo.getValueAt(fila, 1));
         txtDireccion.setText((String) modelo.getValueAt(fila, 2));
@@ -162,6 +165,10 @@ public class SucursalPanel extends JPanel {
     }
 
     private void guardar() {
+        if (!SesionActual.puedeCrear(pantallaID) && !SesionActual.puedeActualizar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "No tienes permiso para esta acción");
+            return;
+        }
         try {
             String codigo = txtCodigo.getText().trim();
             String direccion = txtDireccion.getText().trim();
@@ -183,7 +190,6 @@ public class SucursalPanel extends JPanel {
                 repo.actualizar(s);
                 JOptionPane.showMessageDialog(this, "Sucursal actualizada");
             }
-
             limpiar();
             cargarTabla();
         } catch (Exception e) {
@@ -193,6 +199,10 @@ public class SucursalPanel extends JPanel {
     }
 
     private void eliminar() {
+        if (!SesionActual.puedeBorrar(pantallaID)) {
+            JOptionPane.showMessageDialog(this, "No tienes permiso para eliminar");
+            return;
+        }
         if (idSeleccionado == 0) {
             JOptionPane.showMessageDialog(this, "Selecciona una sucursal");
             return;

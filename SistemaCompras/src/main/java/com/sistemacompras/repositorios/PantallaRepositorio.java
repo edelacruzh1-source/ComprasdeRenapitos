@@ -1,20 +1,20 @@
 package com.sistemacompras.repositorios;
 
 import com.sistemacompras.datos.IConexionBD;
-import com.sistemacompras.entidades.Sucursal;
+import com.sistemacompras.entidades.Pantalla;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SucursalRepositorio {
+public class PantallaRepositorio {
     private final IConexionBD conexion;
 
-    public SucursalRepositorio(IConexionBD conexion) { this.conexion = conexion; }
+    public PantallaRepositorio(IConexionBD conexion) { this.conexion = conexion; }
 
-    public List<Sucursal> obtenerTodos() throws Exception {
-        List<Sucursal> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Sucursal ORDER BY SucursalID";
+    public List<Pantalla> obtenerTodos() throws Exception {
+        List<Pantalla> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Pantalla ORDER BY nombre";
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -23,8 +23,8 @@ public class SucursalRepositorio {
         return lista;
     }
 
-    public Sucursal obtenerPorId(int id) throws Exception {
-        String sql = "SELECT * FROM Sucursal WHERE SucursalID = ?";
+    public Pantalla obtenerPorId(int id) throws Exception {
+        String sql = "SELECT * FROM Pantalla WHERE PantallaID = ?";
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -35,14 +35,12 @@ public class SucursalRepositorio {
         return null;
     }
 
-    public int insertar(Sucursal s) throws Exception {
-        String sql = "INSERT INTO Sucursal (Codigo, Direccion, Ciudad, Departamento) VALUES (?, ?, ?, ?)";
+    public int insertar(Pantalla p) throws Exception {
+        String sql = "INSERT INTO Pantalla (nombre, descripcion) VALUES (?, ?)";
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, s.getCodigo());
-            ps.setString(2, s.getDireccion());
-            ps.setString(3, s.getCiudad());
-            ps.setString(4, s.getDepartamento());
+            ps.setString(1, p.getNombre());
+            ps.setString(2, p.getDescripcion());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) return rs.getInt(1);
@@ -51,21 +49,19 @@ public class SucursalRepositorio {
         return 0;
     }
 
-    public boolean actualizar(Sucursal s) throws Exception {
-        String sql = "UPDATE Sucursal SET Codigo=?, Direccion=?, Ciudad=?, Departamento=? WHERE SucursalID=?";
+    public boolean actualizar(Pantalla p) throws Exception {
+        String sql = "UPDATE Pantalla SET nombre=?, descripcion=? WHERE PantallaID=?";
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, s.getCodigo());
-            ps.setString(2, s.getDireccion());
-            ps.setString(3, s.getCiudad());
-            ps.setString(4, s.getDepartamento());
-            ps.setInt(5, s.getSucursalID());
+            ps.setString(1, p.getNombre());
+            ps.setString(2, p.getDescripcion());
+            ps.setInt(3, p.getPantallaID());
             return ps.executeUpdate() > 0;
         }
     }
 
     public boolean eliminar(int id) throws Exception {
-        String sql = "DELETE FROM Sucursal WHERE SucursalID = ?";
+        String sql = "DELETE FROM Pantalla WHERE PantallaID = ?";
         try (Connection conn = conexion.crearConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -73,13 +69,11 @@ public class SucursalRepositorio {
         }
     }
 
-    private Sucursal mapear(ResultSet rs) throws SQLException {
-        return new Sucursal(
-            rs.getInt("SucursalID"),
-            rs.getString("Codigo"),
-            rs.getString("Direccion"),
-            rs.getString("Ciudad"),
-            rs.getString("Departamento")
+    private Pantalla mapear(ResultSet rs) throws SQLException {
+        return new Pantalla(
+            rs.getInt("PantallaID"),
+            rs.getString("nombre"),
+            rs.getString("descripcion")
         );
     }
 }

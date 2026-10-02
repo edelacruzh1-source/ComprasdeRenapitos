@@ -101,8 +101,7 @@ public class LoginPanel extends JPanel {
 
         add(tarjeta);
 
-        // Enter dispara login
-        getRootPane().setDefaultButton(btnIngresar);
+       
     }
 
     private void autenticar() {
@@ -129,8 +128,9 @@ public class LoginPanel extends JPanel {
                 return;
             }
 
-            // Guardar usuario logueado
+            // Guardar usuario y cargar permisos
             SesionActual.setUsuario(u);
+            SesionActual.cargarPermisos(conexion);  // ← NUEVO
 
             // Cambiar al menú principal
             frame.mostrarPanel("menu");
