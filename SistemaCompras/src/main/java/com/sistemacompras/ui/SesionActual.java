@@ -12,14 +12,18 @@ import java.util.Map;
 public class SesionActual {
 
     private static Usuario usuario;
+    private static IConexionBD conexion;
     private static Map<Integer, Permiso> permisosPorPantalla = new HashMap<>();
 
     public static void setUsuario(Usuario u) { usuario = u; }
     public static Usuario getUsuario() { return usuario; }
 
-    public static void cargarPermisos(IConexionBD conexion) throws Exception {
+    public static void setConexion(IConexionBD c) { conexion = c; }
+    public static IConexionBD getConexion() { return conexion; }
+
+    public static void cargarPermisos() throws Exception {
         permisosPorPantalla.clear();
-        if (usuario == null) return;
+        if (usuario == null || conexion == null) return;
 
         PermisoRepositorio repo = new PermisoRepositorio(conexion);
         List<Permiso> lista = repo.obtenerPorRol(usuario.getRolID());
@@ -58,6 +62,7 @@ public class SesionActual {
 
     public static void cerrarSesion() {
         usuario = null;
+        conexion = null;
         permisosPorPantalla.clear();
     }
 }

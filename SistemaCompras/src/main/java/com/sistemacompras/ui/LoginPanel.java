@@ -1,5 +1,6 @@
 package com.sistemacompras.ui;
 
+import com.sistemacompras.datos.ConexionFactory;
 import com.sistemacompras.datos.IConexionBD;
 import com.sistemacompras.entidades.Usuario;
 import com.sistemacompras.negocio.LoginService;
@@ -9,15 +10,19 @@ import java.awt.*;
 
 public class LoginPanel extends JPanel {
 
-    private final IConexionBD conexion;
     private final MainFrame frame;
     private JTextField txtUsuario;
     private JPasswordField txtPassword;
+    private JComboBox<String> cboGestor;
+    private JLabel lblEstado;
+    private IConexionBD conexionActual;
 
-    public LoginPanel(IConexionBD conexion, MainFrame frame) {
-        this.conexion = conexion;
+    public LoginPanel(MainFrame frame) {
         this.frame = frame;
+        this.conexionActual = ConexionFactory.obtenerConexion(
+            ConexionFactory.TipoGestor.SQL_SERVER);
         initComponents();
+        actualizarEstado();
     }
 
     private void initComponents() {
@@ -31,8 +36,9 @@ public class LoginPanel extends JPanel {
             BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
             BorderFactory.createEmptyBorder(30, 40, 30, 40)
         ));
-        tarjeta.setPreferredSize(new Dimension(380, 320));
+        tarjeta.setPreferredSize(new Dimension(420, 460));
 
+        // Título
         JLabel lblTitulo = new JLabel("INICIAR SESIÓN");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitulo.setForeground(new Color(33, 37, 41));
@@ -43,6 +49,7 @@ public class LoginPanel extends JPanel {
         lblSubtitulo.setForeground(new Color(108, 117, 125));
         lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Usuario
         JLabel lblUsuario = new JLabel("Usuario");
         lblUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblUsuario.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -55,6 +62,7 @@ public class LoginPanel extends JPanel {
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
+        // Contraseña
         JLabel lblPassword = new JLabel("Contraseña");
         lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -66,7 +74,25 @@ public class LoginPanel extends JPanel {
             BorderFactory.createLineBorder(new Color(206, 212, 218)),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
+        txtPassword.addActionListener(e -> autenticar());
 
+        // Selector de Base de Datos
+        JLabel lblGestor = new JLabel("Base de datos");
+        lblGestor.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblGestor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        cboGestor = new JComboBox<>(new String[]{"SQL Server", "MySQL"});
+        cboGestor.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cboGestor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        cboGestor.setAlignmentX(Component.LEFT_ALIGNMENT);
+        cboGestor.addActionListener(e -> cambiarGestor());
+
+        // Estado de conexión
+        lblEstado = new JLabel();
+        lblEstado.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblEstado.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Botón
         JButton btnIngresar = new JButton("INGRESAR");
         btnIngresar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnIngresar.setForeground(Color.WHITE);
@@ -78,13 +104,11 @@ public class LoginPanel extends JPanel {
         btnIngresar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnIngresar.addActionListener(e -> autenticar());
 
-        // Enter en contraseña dispara login
-        txtPassword.addActionListener(e -> autenticar());
-
+        // Armar tarjeta
         tarjeta.add(lblTitulo);
         tarjeta.add(Box.createVerticalStrut(5));
         tarjeta.add(lblSubtitulo);
-        tarjeta.add(Box.createVerticalStrut(25));
+        tarjeta.add(Box.createVerticalStrut(20));
         tarjeta.add(lblUsuario);
         tarjeta.add(Box.createVerticalStrut(5));
         tarjeta.add(txtUsuario);
@@ -92,10 +116,36 @@ public class LoginPanel extends JPanel {
         tarjeta.add(lblPassword);
         tarjeta.add(Box.createVerticalStrut(5));
         tarjeta.add(txtPassword);
-        tarjeta.add(Box.createVerticalStrut(25));
+        tarjeta.add(Box.createVerticalStrut(15));
+        tarjeta.add(lblGestor);
+        tarjeta.add(Box.createVerticalStrut(5));
+        tarjeta.add(cboGestor);
+        tarjeta.add(Box.createVerticalStrut(10));
+        tarjeta.add(lblEstado);
+        tarjeta.add(Box.createVerticalStrut(15));
         tarjeta.add(btnIngresar);
 
         add(tarjeta);
+    }
+
+    private void cambiarGestor() {
+        String seleccionado = (String) cboGestor.getSelectedItem();
+        ConexionFactory.TipoGestor tipo = "MySQL".equals(seleccionado)
+            ? ConexionFactory.TipoGestor.MYSQL
+            : ConexionFactory.TipoGestor.SQL_SERVER;
+
+        conexionActual = ConexionFactory.obtenerConexion(tipo);
+        actualizarEstado();
+    }
+
+    private void actualizarEstado() {
+        if (conexionActual.probarConexion()) {
+            lblEstado.setText("✅ Conectado a " + conexionActual.getNombreGestor());
+            lblEstado.setForeground(new Color(25, 135, 84));
+        } else {
+            lblEstado.setText("❌ Sin conexión a " + conexionActual.getNombreGestor());
+            lblEstado.setForeground(new Color(220, 53, 69));
+        }
     }
 
     private void autenticar() {
@@ -109,8 +159,16 @@ public class LoginPanel extends JPanel {
             return;
         }
 
+        if (!conexionActual.probarConexion()) {
+            JOptionPane.showMessageDialog(this,
+                "No hay conexión a " + conexionActual.getNombreGestor() +
+                "\nRevisa tu configuración.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
-            LoginService service = new LoginService(conexion);
+            LoginService service = new LoginService(conexionActual);
             Usuario u = service.autenticar(usuario, password);
 
             if (u == null) {
@@ -122,15 +180,16 @@ public class LoginPanel extends JPanel {
                 return;
             }
 
-            // Guardar usuario y cargar permisos ANTES de mostrar el menú
+            // Guardar usuario, conexión y cargar permisos
             SesionActual.setUsuario(u);
-            SesionActual.cargarPermisos(conexion);
+            SesionActual.setConexion(conexionActual);
+            SesionActual.cargarPermisos();
 
-            // Limpiar campos para el próximo login
+            // Limpiar campos
             txtUsuario.setText("");
             txtPassword.setText("");
 
-            // Mostrar el menú (se construye AHORA con los permisos cargados)
+            // Mostrar menú
             frame.mostrarPanel("menu");
 
         } catch (Exception ex) {

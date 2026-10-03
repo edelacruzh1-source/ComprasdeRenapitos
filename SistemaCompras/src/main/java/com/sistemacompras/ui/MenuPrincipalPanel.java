@@ -31,7 +31,11 @@ public class MenuPrincipalPanel extends JPanel {
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-        JLabel lblUsuario = new JLabel();
+        Usuario u = SesionActual.getUsuario();
+        String gestor = conexion != null ? conexion.getNombreGestor() : "?";
+        JLabel lblUsuario = new JLabel(
+            (u != null ? u.getNombreUsuario() + "  |  " + u.getNombreRol() : "") +
+            "  |  🗄️ " + gestor);
         lblUsuario.setForeground(Color.WHITE);
         lblUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
@@ -45,7 +49,6 @@ public class MenuPrincipalPanel extends JPanel {
         menuLateral.setPreferredSize(new Dimension(220, 0));
         menuLateral.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // Botones del menú según permisos
         agregarBotonMenu(menuLateral, "Inicio", () -> mostrarInicio());
 
         if (SesionActual.puedeLeer(Pantallas.SUCURSALES)) {
@@ -84,12 +87,6 @@ public class MenuPrincipalPanel extends JPanel {
         add(topBar, BorderLayout.NORTH);
         add(menuLateral, BorderLayout.WEST);
         add(contenido, BorderLayout.CENTER);
-
-        // Info del usuario
-        Usuario u = SesionActual.getUsuario();
-        if (u != null) {
-            lblUsuario.setText(u.getNombreUsuario() + "  |  " + u.getNombreRol());
-        }
     }
 
     private void agregarBotonMenu(JPanel panel, String texto, Runnable accion) {
@@ -143,6 +140,12 @@ public class MenuPrincipalPanel extends JPanel {
         lblRol.setForeground(new Color(108, 117, 125));
         lblRol.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        String gestor = conexion != null ? conexion.getNombreGestor() : "?";
+        JLabel lblConexion = new JLabel("Base de datos: " + gestor);
+        lblConexion.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblConexion.setForeground(new Color(13, 110, 253));
+        lblConexion.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JLabel lblInstruccion = new JLabel(
             "<html><center>Selecciona una opción del menú lateral<br>" +
             "para comenzar a trabajar.</center></html>");
@@ -153,6 +156,8 @@ public class MenuPrincipalPanel extends JPanel {
         tarjeta.add(lblBienvenida);
         tarjeta.add(Box.createVerticalStrut(10));
         tarjeta.add(lblRol);
+        tarjeta.add(Box.createVerticalStrut(5));
+        tarjeta.add(lblConexion);
         tarjeta.add(Box.createVerticalStrut(30));
         tarjeta.add(lblInstruccion);
 
@@ -197,8 +202,8 @@ public class MenuPrincipalPanel extends JPanel {
             JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             SesionActual.cerrarSesion();
-            frame.reiniciarMenu();      // ← destruye el menú actual
-            frame.mostrarPanel("login"); // ← vuelve al login
+            frame.reiniciarMenu();
+            frame.mostrarPanel("login");
         }
     }
 }
