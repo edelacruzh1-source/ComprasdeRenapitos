@@ -2,7 +2,7 @@
 <jasperReport name="Historial_Compras_por_Articulo" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5b1329ed-a64e-4cc7-b15d-8033e0cc748a">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
-	<parameter name="ArticuloID" class="java.lang.Integer">
+	<parameter name="ArticuloID" class="java.lang.String">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
 	</parameter>
 	<query language="SQL"><![CDATA[SELECT 
@@ -18,7 +18,7 @@ INNER JOIN Adjudicacion adj ON ad.AdjudicacionID = adj.AdjudicacionID
 INNER JOIN Pedido_Interno pi ON ad.PedidoID = pi.PedidoID
 INNER JOIN Articulo a ON pi.ArticuloID = a.ArticuloID
 INNER JOIN Proveedor p ON ad.ProveedorID = p.ProveedorID
-WHERE a.ArticuloID =1
+WHERE a.ArticuloID =$P{ArticuloID}
 ORDER BY adj.fechaResolucion DESC;]]></query>
 	<field name="CodigoArticulo" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CodigoArticulo"/>

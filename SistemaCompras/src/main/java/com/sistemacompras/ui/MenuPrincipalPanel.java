@@ -5,6 +5,7 @@ import com.sistemacompras.entidades.Usuario;
 import com.sistemacompras.ui.reportes.AnalisisOfertasPanel;
 import com.sistemacompras.ui.reportes.EficienciaCompraPanel;
 import com.sistemacompras.ui.reportes.GastoDepartamentalPanel;
+import com.sistemacompras.ui.reportes.HistorialComprasPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,6 +93,7 @@ public class MenuPrincipalPanel extends JPanel {
         	agregarBotonMenu(menuLateral,"Analisis de Ofertas", () -> abrirPanel("reporte_ofertas"));
         	agregarBotonMenu(menuLateral, "Eficiencia de Compra", () -> abrirPanel("reporte_eficiencia"));
         	agregarBotonMenu(menuLateral, "Gasto Departamental", () -> abrirPanel("reporte_gasto"));
+        	agregarBotonMenu(menuLateral, "Historial de Compras", () -> abrirPanel("reporte_historial"));
         }
         
         
@@ -204,6 +206,7 @@ public class MenuPrincipalPanel extends JPanel {
                 case "reporte_ofertas" -> new AnalisisOfertasPanel(conexion);
                 case "reporte_eficiencia" -> new EficienciaCompraPanel(conexion);
                 case "reporte_gasto" -> new GastoDepartamentalPanel(conexion);
+                case "reporte_historial" -> new HistorialComprasPanel(conexion);
                 default -> new JPanel();
             };
         } catch (Exception e) {
