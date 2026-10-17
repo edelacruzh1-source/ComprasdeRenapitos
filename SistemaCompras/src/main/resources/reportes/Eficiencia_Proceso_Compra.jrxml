@@ -1,0 +1,118 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="Eficiencia_Proceso_Compra" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b5602267-73e7-451d-bd07-fec4ee63865f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<query language="SQL"><![CDATA[SELECT 
+    o.OrdenID,
+    o.descripcion AS Orden,
+    o.fechaCreacion,
+    adj.fechaResolucion,
+    DATEDIFF(DAY, o.fechaCreacion, adj.fechaResolucion) AS DiasTranscurridos
+FROM Orden_Compra o
+INNER JOIN Adjudicacion adj ON o.OrdenID = adj.OrdenID
+ORDER BY DiasTranscurridos DESC;]]></query>
+	<field name="OrdenID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="OrdenID"/>
+		<property name="com.jaspersoft.studio.field.label" value="OrdenID"/>
+	</field>
+	<field name="Orden" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Orden"/>
+		<property name="com.jaspersoft.studio.field.label" value="Orden"/>
+	</field>
+	<field name="fechaCreacion" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fechaCreacion"/>
+		<property name="com.jaspersoft.studio.field.label" value="fechaCreacion"/>
+	</field>
+	<field name="fechaResolucion" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fechaResolucion"/>
+		<property name="com.jaspersoft.studio.field.label" value="fechaResolucion"/>
+	</field>
+	<field name="DiasTranscurridos" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="DiasTranscurridos"/>
+		<property name="com.jaspersoft.studio.field.label" value="DiasTranscurridos"/>
+	</field>
+	<variable name="PromedioDias" calculation="Average" class="java.lang.Double">
+		<expression><![CDATA[$F{DiasTranscurridos}]]></expression>
+	</variable>
+	<background/>
+	<title height="72">
+		<element kind="frame" uuid="1467c217-f83f-4026-aab3-65f95d829dcc" x="-20" y="-20" width="595" height="92" backcolor="#006699" mode="Opaque">
+			<element kind="staticText" uuid="fac2397c-e11b-4266-8d6e-478d55e85515" x="20" y="20" width="555" height="43" forecolor="#FFFFFF" fontSize="25.0" bold="true" hTextAlign="Center">
+				<text><![CDATA[EFICIENCIA DEL PROCESO DE COMPRA]]></text>
+			</element>
+			<element kind="staticText" uuid="ba3e8e5d-0d99-4a79-93a0-0da7b5e1efc1" x="20" y="63" width="555" height="20" forecolor="#FFFFFF" fontSize="14.0" bold="false" hTextAlign="Center">
+				<text><![CDATA[Tiempo desde creación hasta adjudicación]]></text>
+			</element>
+		</element>
+	</title>
+	<pageHeader height="13"/>
+	<columnHeader height="21">
+		<element kind="line" uuid="3f0151b3-7d25-47ee-9edf-c473f9038dbf" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+		<element kind="staticText" uuid="1cb101de-80b8-4e54-983b-4df0845f5fe5" x="0" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="041c15e2-b7cf-46a1-9e17-baeacc59cec2"/>
+			<text><![CDATA[Orden]]></text>
+		</element>
+		<element kind="staticText" uuid="dfc9c25a-47ac-40a5-b71b-3f8fd136d9c1" x="111" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b06c69bc-5cef-4b60-8682-115766d0e71b"/>
+			<text><![CDATA[Descripción]]></text>
+		</element>
+		<element kind="staticText" uuid="be9d9615-c290-4a51-8066-e9e02337d484" x="222" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea70566b-185b-4d53-8214-cb81511f0796"/>
+			<text><![CDATA[F. Creacion]]></text>
+		</element>
+		<element kind="staticText" uuid="ad3e4800-8b62-430f-acb0-ca5a680e09fe" x="333" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c51fdfe9-866c-4e66-8c81-53e724abf09b"/>
+			<text><![CDATA[F. Resolución]]></text>
+		</element>
+		<element kind="staticText" uuid="dd079405-3627-4d31-8e97-ad2af4747fd2" x="444" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c793660e-2b42-4066-bd5f-29f3afb9cfb1"/>
+			<text><![CDATA[Días]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<element kind="line" uuid="b2e7cd17-d770-45de-86de-f27eb97fd65e" x="0" y="19" width="555" height="1" positionType="FixRelativeToBottom"/>
+			<element kind="textField" uuid="6fd97f2b-52bf-4865-859b-7116af05f136" x="0" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="041c15e2-b7cf-46a1-9e17-baeacc59cec2"/>
+				<expression><![CDATA[$F{OrdenID}]]></expression>
+			</element>
+			<element kind="textField" uuid="8111bee8-c5f5-4585-b3df-55e0938b51c1" x="111" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b06c69bc-5cef-4b60-8682-115766d0e71b"/>
+				<expression><![CDATA[$F{Orden}]]></expression>
+			</element>
+			<element kind="textField" uuid="ad77333f-4317-4945-a5fe-305500c1c553" x="222" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight" pattern="dd/MM/yyyy" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea70566b-185b-4d53-8214-cb81511f0796"/>
+				<expression><![CDATA[$F{fechaCreacion}]]></expression>
+			</element>
+			<element kind="textField" uuid="a9751e4f-6a98-4087-890d-21724615d02e" x="333" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight" pattern="dd/MM/yyyy" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c51fdfe9-866c-4e66-8c81-53e724abf09b"/>
+				<expression><![CDATA[$F{fechaResolucion}]]></expression>
+			</element>
+			<element kind="textField" uuid="f4d84930-38c7-46dc-974f-da434bcb029c" x="444" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c793660e-2b42-4066-bd5f-29f3afb9cfb1"/>
+				<expression><![CDATA[$F{DiasTranscurridos}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter/>
+	<pageFooter height="17">
+		<element kind="textField" uuid="91c4a624-1cdc-405c-b82e-1fe95aadddff" x="0" y="4" width="515" height="13" backcolor="#E6E6E6" mode="Opaque" hTextAlign="Right">
+			<expression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></expression>
+		</element>
+		<element kind="textField" uuid="84ba8839-0e5b-49a7-8712-2ad2a8b2ea93" x="515" y="4" width="40" height="13" backcolor="#E6E6E6" mode="Opaque" evaluationTime="Report">
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+		<element kind="textField" uuid="76c947db-04fa-4615-aeaf-938faeec3a53" x="0" y="4" width="100" height="13" pattern="EEEEE dd MMMMM yyyy">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+	</pageFooter>
+	<summary height="52">
+		<element kind="staticText" uuid="c050149f-05f0-47c6-9b70-600d2c4dd606" x="444" y="0" width="111" height="20" fontSize="14.0" hTextAlign="Center">
+			<text><![CDATA[PROMEDIO:]]></text>
+		</element>
+		<element kind="textField" uuid="ebe9affa-3d78-4c7d-9eb1-73a72842f648" x="444" y="20" width="111" height="30" fontSize="14.0" pattern="#,##0.00" hTextAlign="Center">
+			<expression><![CDATA[$V{PromedioDias}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</summary>
+</jasperReport>

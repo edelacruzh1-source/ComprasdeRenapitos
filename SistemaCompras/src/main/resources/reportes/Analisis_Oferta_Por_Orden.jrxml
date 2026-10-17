@@ -1,0 +1,128 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="Analisis_Oferta_Por_Orden" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="48e18930-5c67-417e-9f86-cb1b4ddf8806">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<parameter name="OrdenID" class="java.lang.Integer"/>
+	<query language="SQL"><![CDATA[SELECT 
+    o.OrdenID,
+    o.descripcion AS Orden,
+    op.PedidoID AS Pedido,
+    p.nombreComercial AS Proveedor,
+    op.precioUnitario AS Precio,
+    op.fechaOferta,
+    CASE 
+        WHEN op.precioUnitario = (
+            SELECT MIN(op2.precioUnitario) 
+            FROM Oferta_Proveedor op2 
+            WHERE op2.PedidoID = op.PedidoID
+        ) THEN 'MEJOR OPCIÓN'
+        ELSE ''
+    END AS Estado
+FROM Oferta_Proveedor op
+INNER JOIN Orden_Pedido ordp ON op.PedidoID = ordp.PedidoID
+INNER JOIN Orden_Compra o ON ordp.OrdenID = o.OrdenID
+INNER JOIN Proveedor p ON op.ProveedorID = p.ProveedorID
+WHERE o.OrdenID = $P{OrdenID}
+ORDER BY o.OrdenID, op.PedidoID, op.precioUnitario;]]></query>
+	<field name="OrdenID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="OrdenID"/>
+		<property name="com.jaspersoft.studio.field.label" value="OrdenID"/>
+	</field>
+	<field name="Orden" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Orden"/>
+		<property name="com.jaspersoft.studio.field.label" value="Orden"/>
+	</field>
+	<field name="Pedido" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Pedido"/>
+		<property name="com.jaspersoft.studio.field.label" value="Pedido"/>
+	</field>
+	<field name="Proveedor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Proveedor"/>
+		<property name="com.jaspersoft.studio.field.label" value="Proveedor"/>
+	</field>
+	<field name="Precio" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="Precio"/>
+		<property name="com.jaspersoft.studio.field.label" value="Precio"/>
+	</field>
+	<field name="fechaOferta" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fechaOferta"/>
+		<property name="com.jaspersoft.studio.field.label" value="fechaOferta"/>
+	</field>
+	<field name="Estado" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Estado"/>
+		<property name="com.jaspersoft.studio.field.label" value="Estado"/>
+	</field>
+	<background/>
+	<title height="72">
+		<element kind="frame" uuid="06fa1bc5-99d6-446e-a0aa-e12bb92adbe6" x="-20" y="-20" width="595" height="92" backcolor="#006699" mode="Opaque">
+			<element kind="staticText" uuid="5304bed0-1137-4aad-b26f-820c1a9f055a" x="0" y="20" width="595" height="43" forecolor="#FFFFFF" fontSize="29.0" bold="true" hTextAlign="Center">
+				<text><![CDATA[ ANÁLISIS DE OFERTAS POR ORDEN]]></text>
+			</element>
+			<element kind="textField" uuid="42e2350a-5178-411a-8780-580bc8fcce8c" x="0" y="60" width="595" height="30" forecolor="#FFFFFF" fontSize="14.0" hTextAlign="Center">
+				<expression><![CDATA["Orden: " + $P{OrdenID} + " - " + $F{Orden}]]></expression>
+			</element>
+		</element>
+	</title>
+	<pageHeader height="13"/>
+	<columnHeader height="21">
+		<element kind="line" uuid="0eb3441d-a10c-4513-a9c5-baa411f534ec" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+		<element kind="staticText" uuid="9a78be61-7670-44f3-b91d-096823f6f60c" x="0" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4696a85-1f5d-457d-86f7-0be8f9eed920"/>
+			<text><![CDATA[Pedido]]></text>
+		</element>
+		<element kind="staticText" uuid="f64ab7f7-060c-49a7-96a2-e60487fb57a2" x="138" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0abce92e-15e1-4306-8d24-83dda3a801e6"/>
+			<text><![CDATA[Proveedor]]></text>
+		</element>
+		<element kind="staticText" uuid="19c606e0-d511-47f9-b96b-055acc967453" x="276" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa8e4e3a-30f9-4a19-8426-19cb52a58eb8"/>
+			<text><![CDATA[Precio]]></text>
+		</element>
+		<element kind="staticText" uuid="32957972-09d3-49dd-a426-cc6db196cd2f" x="414" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4c621558-f8fe-4172-95ac-4f4d1d11a676"/>
+			<text><![CDATA[Estado]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<element kind="line" uuid="cbadd549-349c-48cd-938c-f2ff4994a707" x="0" y="19" width="555" height="1" positionType="FixRelativeToBottom"/>
+			<element kind="textField" uuid="231aacbb-4cd3-4baf-9be1-a59d8022b597" x="0" y="0" width="138" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4696a85-1f5d-457d-86f7-0be8f9eed920"/>
+				<expression><![CDATA[$F{Pedido}]]></expression>
+			</element>
+			<element kind="textField" uuid="1b2bd7b7-5f6a-4c5c-9c53-d8dd4fb6bb25" x="138" y="0" width="138" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0abce92e-15e1-4306-8d24-83dda3a801e6"/>
+				<expression><![CDATA[$F{Proveedor}]]></expression>
+			</element>
+			<element kind="textField" uuid="3630c818-3694-4737-8282-34dd23be2fc1" x="276" y="0" width="138" height="20" fontSize="14.0" textAdjust="StretchHeight" pattern="Q #,##0.00" hTextAlign="Right">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa8e4e3a-30f9-4a19-8426-19cb52a58eb8"/>
+				<expression><![CDATA[$F{Precio}]]></expression>
+			</element>
+			<element kind="textField" uuid="7fb18b03-31f2-4266-bbee-2f56fa1ab429" x="414" y="0" width="138" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4c621558-f8fe-4172-95ac-4f4d1d11a676"/>
+				<expression><![CDATA[$F{Estado}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter/>
+	<pageFooter height="17">
+		<element kind="textField" uuid="71f11dcd-edde-4c0f-b24e-204748dd6d11" x="0" y="4" width="515" height="13" backcolor="#E6E6E6" mode="Opaque" hTextAlign="Right">
+			<expression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></expression>
+		</element>
+		<element kind="textField" uuid="e174642a-bc68-4617-ba66-63c411c10768" x="515" y="4" width="40" height="13" backcolor="#E6E6E6" mode="Opaque" evaluationTime="Report">
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+		<element kind="textField" uuid="98ef4a01-0d2a-437f-bf2e-9344a2aa9baa" x="0" y="4" width="100" height="13" pattern="EEEEE dd MMMMM yyyy">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+	</pageFooter>
+	<summary height="58">
+		<element kind="staticText" uuid="370433b0-f635-4c93-9f3d-5cfe531341a5" x="276" y="0" width="138" height="40" fontSize="14.0" hTextAlign="Right">
+			<text><![CDATA[Total de ofertas recibidas:]]></text>
+		</element>
+		<element kind="textField" uuid="601a6642-8d7d-41f0-b966-5b86c9a116dc" x="414" y="0" width="141" height="40" fontSize="14.0" hTextAlign="Right">
+			<expression><![CDATA[$V{REPORT_COUNT}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</summary>
+</jasperReport>

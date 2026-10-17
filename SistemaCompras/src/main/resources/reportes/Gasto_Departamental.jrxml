@@ -1,0 +1,105 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="Gasto_Departamental" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e1a7031f-e795-448c-927c-53f74340087f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<parameter name="SucursalID" class="java.lang.Integer"/>
+	<parameter name="Anio" class="java.lang.Integer"/>
+	<query language="SQL"><![CDATA[SELECT 
+    s.Codigo AS Sucursal,
+    d.nombre AS Departamento,
+    COUNT(DISTINCT ad.PedidoID) AS TotalPedidos,
+    SUM(ad.cantidadFinal * ad.precioAcordado) AS GastoTotal
+FROM Adjudicacion_Detalle ad
+INNER JOIN Pedido_Interno pi ON ad.PedidoID = pi.PedidoID
+INNER JOIN Departamento d ON pi.DepartamentoID = d.DepartamentoID
+INNER JOIN Sucursal s ON d.SucursalID = s.SucursalID
+INNER JOIN Adjudicacion adj ON ad.AdjudicacionID = adj.AdjudicacionID
+WHERE s.SucursalID = $P{SucursalID}
+  AND YEAR(adj.fechaResolucion) = $P{Anio}
+GROUP BY s.Codigo, d.nombre
+ORDER BY GastoTotal DESC;]]></query>
+	<field name="Sucursal" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Sucursal"/>
+		<property name="com.jaspersoft.studio.field.label" value="Sucursal"/>
+	</field>
+	<field name="Departamento" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Departamento"/>
+		<property name="com.jaspersoft.studio.field.label" value="Departamento"/>
+	</field>
+	<field name="TotalPedidos" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="TotalPedidos"/>
+		<property name="com.jaspersoft.studio.field.label" value="TotalPedidos"/>
+	</field>
+	<field name="GastoTotal" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GastoTotal"/>
+		<property name="com.jaspersoft.studio.field.label" value="GastoTotal"/>
+	</field>
+	<variable name="SumaTotal" calculation="Sum" class="java.math.BigDecimal">
+		<expression><![CDATA[$F{GastoTotal}]]></expression>
+	</variable>
+	<background/>
+	<title height="72">
+		<element kind="frame" uuid="96355851-5789-4ca5-9242-048b4f7fb64a" x="-20" y="-20" width="595" height="92" backcolor="#006699" mode="Opaque">
+			<element kind="staticText" uuid="413990ac-5541-4a6d-ba53-c6312f5e11a7" x="20" y="20" width="555" height="43" forecolor="#FFFFFF" fontSize="34.0" bold="true" hTextAlign="Center">
+				<text><![CDATA[GASTO POR DEPARTAMENTO]]></text>
+			</element>
+			<element kind="textField" uuid="ddcff270-05cf-4e24-af4e-9b479f21e4fd" x="160" y="60" width="240" height="30" hTextAlign="Center">
+				<expression><![CDATA["Sucursal: " + $F{Sucursal} + " | Año: " + $P{Anio}]]></expression>
+			</element>
+		</element>
+	</title>
+	<pageHeader height="13"/>
+	<columnHeader height="21">
+		<element kind="line" uuid="dc165dc8-11a4-4cf7-8892-2646c9a4d633" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+		<element kind="staticText" uuid="1dae39d8-f951-4cbd-852e-fb8ce89ac596" x="0" y="0" width="185" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="23fe7195-0800-4fd7-ab68-445bc92e1494"/>
+			<text><![CDATA[Departamento]]></text>
+		</element>
+		<element kind="staticText" uuid="a28c11ed-11b7-4fe0-a025-0050f7adc418" x="185" y="0" width="185" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9f5e48ad-ab78-44e2-a0ef-7db52dfd6c7d"/>
+			<text><![CDATA[Pedidos]]></text>
+		</element>
+		<element kind="staticText" uuid="643bb831-94d3-440e-b87c-921274df7437" x="370" y="0" width="185" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea128511-b9fe-4494-81dc-cd9c75caa620"/>
+			<text><![CDATA[Gasto Total]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<element kind="line" uuid="69647c87-6bc3-46df-b13b-6691d580637f" x="0" y="19" width="555" height="1" positionType="FixRelativeToBottom"/>
+			<element kind="textField" uuid="a51644e5-b9e2-4529-b884-7850bf08d212" x="0" y="0" width="185" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="23fe7195-0800-4fd7-ab68-445bc92e1494"/>
+				<expression><![CDATA[$F{Departamento}]]></expression>
+			</element>
+			<element kind="textField" uuid="e30a5ca1-4009-476e-a243-f8cc0d441f0f" x="185" y="0" width="185" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9f5e48ad-ab78-44e2-a0ef-7db52dfd6c7d"/>
+				<expression><![CDATA[$F{TotalPedidos}]]></expression>
+			</element>
+			<element kind="textField" uuid="da79271a-de82-42cb-b51e-e19988362468" x="370" y="0" width="185" height="20" fontSize="14.0" textAdjust="StretchHeight" pattern="Q #,##0.00" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea128511-b9fe-4494-81dc-cd9c75caa620"/>
+				<expression><![CDATA[$F{GastoTotal}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter/>
+	<pageFooter height="17">
+		<element kind="textField" uuid="44345e2a-95b0-49e3-b26a-6bfee63e980b" x="0" y="4" width="515" height="13" backcolor="#E6E6E6" mode="Opaque" hTextAlign="Right">
+			<expression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></expression>
+		</element>
+		<element kind="textField" uuid="e113d624-3ab0-4453-bb93-5b2f08e68d89" x="515" y="4" width="40" height="13" backcolor="#E6E6E6" mode="Opaque" evaluationTime="Report">
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+		<element kind="textField" uuid="349307fe-9499-4e13-8bd5-f9a12b328284" x="0" y="4" width="100" height="13" pattern="EEEEE dd MMMMM yyyy">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+	</pageFooter>
+	<summary height="30">
+		<element kind="staticText" uuid="9b1a4c29-2b09-4ee4-9541-340035097353" x="270" y="0" width="100" height="30" fontSize="14.0" hTextAlign="Right">
+			<text><![CDATA[Total:]]></text>
+		</element>
+		<element kind="textField" uuid="3e07ae5d-292d-4aa3-9c5d-5196791bbdda" x="370" y="0" width="185" height="30" fontSize="14.0" pattern="Q #,##0.00" hTextAlign="Center">
+			<expression><![CDATA[$V{SumaTotal}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</summary>
+</jasperReport>

@@ -2,6 +2,9 @@ package com.sistemacompras.ui;
 
 import com.sistemacompras.datos.IConexionBD;
 import com.sistemacompras.entidades.Usuario;
+import com.sistemacompras.ui.reportes.AnalisisOfertasPanel;
+import com.sistemacompras.ui.reportes.EficienciaCompraPanel;
+import com.sistemacompras.ui.reportes.GastoDepartamentalPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,6 +78,23 @@ public class MenuPrincipalPanel extends JPanel {
         if (SesionActual.puedeLeer(Pantallas.USUARIOS)) {
             agregarBotonMenu(menuLateral, "Usuarios", () -> abrirPanel("usuarios"));
         }
+        
+        // Separador visual
+        JSeparator sep = new JSeparator();
+        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        sep.setForeground(new Color(108,117,125));
+        menuLateral.add(Box.createVerticalStrut(10));
+        menuLateral.add(sep);
+        menuLateral.add(Box.createVerticalStrut(10));
+        
+        //Reportes
+        if (SesionActual.puedeLeer(Pantallas.REPORTES) || SesionActual.puedeLeer(Pantallas.ADJUDICACIONES)) {
+        	agregarBotonMenu(menuLateral,"Analisis de Ofertas", () -> abrirPanel("reporte_ofertas"));
+        	agregarBotonMenu(menuLateral, "Eficiencia de Compra", () -> abrirPanel("reporte_eficiencia"));
+        	agregarBotonMenu(menuLateral, "Gasto Departamental", () -> abrirPanel("reporte_gasto"));
+        }
+        
+        
 
         menuLateral.add(Box.createVerticalGlue());
         agregarBotonMenu(menuLateral, "Cerrar Sesión", this::cerrarSesion);
@@ -181,6 +201,9 @@ public class MenuPrincipalPanel extends JPanel {
                 case "ordenes" -> new OrdenCompraPanel(conexion);
                 case "adjudicaciones" -> new AdjudicacionPanel(conexion);
                 case "usuarios" -> new UsuarioPanel(conexion);
+                case "reporte_ofertas" -> new AnalisisOfertasPanel(conexion);
+                case "reporte_eficiencia" -> new EficienciaCompraPanel(conexion);
+                case "reporte_gasto" -> new GastoDepartamentalPanel(conexion);
                 default -> new JPanel();
             };
         } catch (Exception e) {

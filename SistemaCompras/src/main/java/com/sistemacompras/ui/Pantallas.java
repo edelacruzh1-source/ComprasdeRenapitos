@@ -9,4 +9,5 @@ public class Pantallas {
     public static final int ORDENES = 6;
     public static final int ADJUDICACIONES = 7;
     public static final int USUARIOS = 8;
+    public static final int REPORTES = 9;
 }

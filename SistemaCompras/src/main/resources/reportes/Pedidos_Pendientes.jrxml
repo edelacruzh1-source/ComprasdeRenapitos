@@ -1,0 +1,145 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="Pedidos_Pendientes" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ef695972-3626-4f0f-ae51-3b0a10accd87">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<query language="SQL"><![CDATA[SELECT 
+    p.PedidoID,
+    s.Codigo AS CodigoSucursal,
+    d.nombre AS Departamento,
+    a.codigo AS CodigoArticulo,
+    a.nombre AS Articulo,
+    p.cantidad,
+    p.fechaSolicitud,
+    p.fechaNecesidad
+FROM dbo.Pedido_Interno p
+INNER JOIN dbo.Departamento d ON p.DepartamentoID = d.DepartamentoID
+INNER JOIN dbo.Sucursal s ON d.SucursalID = s.SucursalID
+INNER JOIN dbo.Articulo a ON p.ArticuloID = a.ArticuloID
+LEFT JOIN dbo.Orden_Pedido op ON p.PedidoID = op.PedidoID
+WHERE op.PedidoID IS NULL
+ORDER BY p.fechaSolicitud;]]></query>
+	<field name="PedidoID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="PedidoID"/>
+		<property name="com.jaspersoft.studio.field.label" value="PedidoID"/>
+	</field>
+	<field name="CodigoSucursal" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CodigoSucursal"/>
+		<property name="com.jaspersoft.studio.field.label" value="CodigoSucursal"/>
+	</field>
+	<field name="Departamento" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Departamento"/>
+		<property name="com.jaspersoft.studio.field.label" value="Departamento"/>
+	</field>
+	<field name="CodigoArticulo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CodigoArticulo"/>
+		<property name="com.jaspersoft.studio.field.label" value="CodigoArticulo"/>
+	</field>
+	<field name="Articulo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Articulo"/>
+		<property name="com.jaspersoft.studio.field.label" value="Articulo"/>
+	</field>
+	<field name="cantidad" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="cantidad"/>
+		<property name="com.jaspersoft.studio.field.label" value="cantidad"/>
+	</field>
+	<field name="fechaSolicitud" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fechaSolicitud"/>
+		<property name="com.jaspersoft.studio.field.label" value="fechaSolicitud"/>
+	</field>
+	<field name="fechaNecesidad" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fechaNecesidad"/>
+		<property name="com.jaspersoft.studio.field.label" value="fechaNecesidad"/>
+	</field>
+	<background height="13"/>
+	<title height="143">
+		<element kind="frame" uuid="80e24920-0644-4cbd-ae9c-89664f202f1d" x="-20" y="-20" width="595" height="163" backcolor="#006699" mode="Opaque">
+			<element kind="staticText" uuid="d863f1ad-a3c3-4f5d-aee4-2c076dde630a" x="20" y="20" width="555" height="90" forecolor="#FFFFFF" fontSize="34.0" bold="true" hTextAlign="Center">
+				<text><![CDATA[PEDIDOS PENDIENTES DE ASIGNAR A ORDEN]]></text>
+			</element>
+			<element kind="staticText" uuid="cc041957-dd7e-4a91-80cb-193a25a30834" x="80" y="110" width="180" height="20" forecolor="#FFFFFF" fontSize="14.0" bold="false" hTextAlign="Right">
+				<text><![CDATA[Fecha de generación:]]></text>
+			</element>
+			<element kind="textField" uuid="6bd3db51-1c12-41c3-9d52-eae4f0a3fad8" x="264" y="110" width="116" height="30" fontSize="14.0" pattern="MMMMM dd, yyyy">
+				<expression><![CDATA[new java.util.Date()]]></expression>
+			</element>
+		</element>
+	</title>
+	<pageHeader height="13"/>
+	<columnHeader height="21">
+		<element kind="line" uuid="5363b7ba-c5cb-4efe-b474-7b5fb621706b" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+		<element kind="staticText" uuid="3cc1ff1d-ea11-4774-bf0f-4dc026991ae5" x="0" y="0" width="92" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="11985663-2410-4428-8bed-69891aabfb3b"/>
+			<text><![CDATA[ID]]></text>
+		</element>
+		<element kind="staticText" uuid="85cf274f-2bf0-4926-9830-2abb2dc87af2" x="92" y="0" width="92" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a2f671b0-336b-4123-bdc6-e93341dee496"/>
+			<text><![CDATA[Sucursal]]></text>
+		</element>
+		<element kind="staticText" uuid="0bddff52-061e-4c93-a129-e96b90407186" x="184" y="0" width="92" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="30445b56-be4f-4b90-8766-e01984222810"/>
+			<text><![CDATA[Departamento]]></text>
+		</element>
+		<element kind="staticText" uuid="fbcc850d-0ebc-4a87-a92c-c39d2957f9e0" x="276" y="0" width="92" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3e37afdf-17c1-46aa-abc8-a69556708b47"/>
+			<text><![CDATA[Articulo]]></text>
+		</element>
+		<element kind="staticText" uuid="2796aa0b-01d1-455e-b6b5-a709b149561a" x="368" y="0" width="92" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="98649081-3867-44cf-962d-e04da66e062d"/>
+			<text><![CDATA[cantidad]]></text>
+		</element>
+		<element kind="staticText" uuid="921c3332-6139-4b62-83fd-f1d06ab9b5ae" x="460" y="0" width="95" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2fe689e3-22b8-4539-ae28-938e4b514b8b"/>
+			<text><![CDATA[F. Solicitud]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<element kind="line" uuid="6b626629-b19b-458e-9074-36c1308c8ee5" x="0" y="19" width="555" height="1" positionType="FixRelativeToBottom"/>
+			<element kind="textField" uuid="5a15c685-22c3-4604-bad1-8cd0349799b0" x="0" y="0" width="92" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="11985663-2410-4428-8bed-69891aabfb3b"/>
+				<expression><![CDATA[$F{PedidoID}]]></expression>
+			</element>
+			<element kind="textField" uuid="f4087936-b90c-4c10-84d2-9ed1072cae43" x="92" y="0" width="92" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a2f671b0-336b-4123-bdc6-e93341dee496"/>
+				<expression><![CDATA[$F{CodigoSucursal}]]></expression>
+			</element>
+			<element kind="textField" uuid="fef3d70d-44bd-4ce6-8ab8-d5be82f70c2d" x="184" y="0" width="92" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="30445b56-be4f-4b90-8766-e01984222810"/>
+				<expression><![CDATA[$F{Departamento}]]></expression>
+			</element>
+			<element kind="textField" uuid="cca84859-076e-4492-81f2-9da0a2a06db0" x="276" y="0" width="92" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3e37afdf-17c1-46aa-abc8-a69556708b47"/>
+				<expression><![CDATA[$F{Articulo}]]></expression>
+			</element>
+			<element kind="textField" uuid="f2d1c58e-d2ec-4951-8abb-e264c34d4c2f" x="368" y="0" width="92" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="98649081-3867-44cf-962d-e04da66e062d"/>
+				<expression><![CDATA[$F{cantidad}]]></expression>
+			</element>
+			<element kind="textField" uuid="ff6eff9e-3ddc-40d7-97ff-96fd92057df3" x="460" y="0" width="100" height="20" fontSize="14.0" textAdjust="StretchHeight" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2fe689e3-22b8-4539-ae28-938e4b514b8b"/>
+				<expression><![CDATA[$F{fechaSolicitud}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter/>
+	<pageFooter height="13">
+		<element kind="textField" uuid="ba4c93e7-1876-442c-8ec8-be0902eeca80" x="0" y="0" width="515" height="13" backcolor="#E6E6E6" mode="Opaque" hTextAlign="Right">
+			<expression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></expression>
+		</element>
+		<element kind="textField" uuid="2d4fc66e-2b68-4b0d-8404-c73eee747969" x="0" y="0" width="100" height="13" pattern="EEEEE dd MMMMM yyyy">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+		<element kind="textField" uuid="c1679f11-c6b1-4356-bf46-7e9794243230" x="515" y="0" width="40" height="13" backcolor="#E6E6E6" mode="Opaque" evaluationTime="Report">
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</pageFooter>
+	<summary height="30">
+		<element kind="staticText" uuid="175bf362-7505-4813-8a14-d522e1ec7cd0" x="235" y="0" width="191" height="30" fontSize="14.0">
+			<text><![CDATA[Total de pedidos pendientes:]]></text>
+		</element>
+		<element kind="textField" uuid="8f2bd01f-b11e-4bf1-aa44-97dcf6137a68" x="425" y="0" width="130" height="30" fontSize="14.0">
+			<expression><![CDATA[$V{PAGE_COUNT} ]]></expression>
+		</element>
+	</summary>
+</jasperReport>

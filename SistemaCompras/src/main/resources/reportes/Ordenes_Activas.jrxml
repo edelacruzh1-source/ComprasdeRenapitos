@@ -1,0 +1,111 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="Ordenes_Activas" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="114a8cf7-e655-4482-8414-0f1df067d714">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<query language="SQL"><![CDATA[SELECT * 
+FROM Vista_OrdenesActivas
+ORDER BY fechaLimite;]]></query>
+	<field name="OrdenID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="OrdenID"/>
+		<property name="com.jaspersoft.studio.field.label" value="OrdenID"/>
+	</field>
+	<field name="descripcion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="descripcion"/>
+	</field>
+	<field name="fechaLimite" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fechaLimite"/>
+		<property name="com.jaspersoft.studio.field.label" value="fechaLimite"/>
+	</field>
+	<field name="tipoOrden" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="tipoOrden"/>
+		<property name="com.jaspersoft.studio.field.label" value="tipoOrden"/>
+	</field>
+	<field name="DiasRestantes" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="DiasRestantes"/>
+		<property name="com.jaspersoft.studio.field.label" value="DiasRestantes"/>
+	</field>
+	<background height="13"/>
+	<title height="93">
+		<element kind="frame" uuid="d44d8ecc-00eb-4633-ab72-a1fbfb1b0434" x="-20" y="-20" width="595" height="110" backcolor="#006699" mode="Opaque">
+			<element kind="staticText" uuid="8000e41d-ef22-40b7-b340-f522bcea78d6" x="20" y="20" width="555" height="43" forecolor="#FFFFFF" fontSize="34.0" bold="true">
+				<text><![CDATA[ORDENES DE COMPRA ACTIVAS]]></text>
+			</element>
+			<element kind="staticText" uuid="c5ac9962-9d83-42a9-96f3-b20de6330e22" x="220" y="70" width="180" height="20" forecolor="#FFFFFF" fontSize="14.0" bold="false" hTextAlign="Center">
+				<text><![CDATA[(abiertas a recibir ofertas)]]></text>
+			</element>
+		</element>
+	</title>
+	<pageHeader height="13"/>
+	<columnHeader height="21">
+		<element kind="line" uuid="d76690dd-af16-4227-90ed-5b448dc21b76" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+		<element kind="staticText" uuid="e2eaee84-8c1c-4d6a-a4a2-011ad911d2b4" x="0" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce7389e7-7c2a-4dfa-9ae6-772d2be5263a"/>
+			<text><![CDATA[ID]]></text>
+		</element>
+		<element kind="staticText" uuid="a37dff5f-1b63-497b-8c47-b14e4a5a3ac9" x="111" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b08f8a5d-5c2a-441c-8bbc-34c9c05afd63"/>
+			<text><![CDATA[Descripcion]]></text>
+		</element>
+		<element kind="staticText" uuid="5b9d3380-668b-496f-a08f-f4365cc7fa4e" x="222" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a8de761e-d60c-4101-80b0-9e99f138ebe7"/>
+			<text><![CDATA[F. Limite]]></text>
+		</element>
+		<element kind="staticText" uuid="2a3ce085-3ff2-4d48-b052-05235678a336" x="333" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9466b4ed-be65-47bc-8982-1ff5bc2ba4f4"/>
+			<text><![CDATA[Tipo]]></text>
+		</element>
+		<element kind="staticText" uuid="0c73e37d-93a5-49f4-b830-68a2a6d8f53e" x="444" y="0" width="111" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a6aa6f10-498f-42ce-a8d7-fbf7ceedd5c2"/>
+			<text><![CDATA[DiasRestantes]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<element kind="line" uuid="1617152b-bc39-4043-bbbb-a8d19c239050" x="0" y="19" width="555" height="1" positionType="FixRelativeToBottom"/>
+			<element kind="textField" uuid="61bddbc2-f0d2-4a9e-9bcb-30098482ac90" x="0" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce7389e7-7c2a-4dfa-9ae6-772d2be5263a"/>
+				<expression><![CDATA[$F{OrdenID}]]></expression>
+			</element>
+			<element kind="textField" uuid="b34e47ef-52dc-467a-82e8-11574e6e10d1" x="111" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b08f8a5d-5c2a-441c-8bbc-34c9c05afd63"/>
+				<expression><![CDATA[$F{descripcion}]]></expression>
+			</element>
+			<element kind="textField" uuid="b819f108-dc1f-406d-b1eb-e660797d7c80" x="222" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a8de761e-d60c-4101-80b0-9e99f138ebe7"/>
+				<expression><![CDATA[$F{fechaLimite}]]></expression>
+			</element>
+			<element kind="textField" uuid="1e87929f-94a1-4bab-9848-6b4588226d77" x="333" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9466b4ed-be65-47bc-8982-1ff5bc2ba4f4"/>
+				<expression><![CDATA[$F{tipoOrden}]]></expression>
+			</element>
+			<element kind="textField" uuid="07abed61-88a0-4637-bb50-31af4b507845" x="444" y="0" width="111" height="20" fontSize="14.0" textAdjust="StretchHeight">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a6aa6f10-498f-42ce-a8d7-fbf7ceedd5c2"/>
+				<expression><![CDATA[$F{DiasRestantes}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter/>
+	<pageFooter height="13">
+		<element kind="textField" uuid="0a593428-319e-4c91-9263-1d7cd7c96132" x="515" y="0" width="40" height="13" backcolor="#E6E6E6" mode="Opaque" evaluationTime="Report">
+			<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+		<element kind="textField" uuid="0db2440e-907f-43d3-90da-49602513bd1b" x="0" y="0" width="515" height="13" backcolor="#E6E6E6" mode="Opaque" hTextAlign="Right">
+			<expression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></expression>
+		</element>
+		<element kind="textField" uuid="c99bc5b8-dcd0-4141-a986-481723d6cc7b" x="0" y="0" width="100" height="13" pattern="EEEEE dd MMMMM yyyy">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</pageFooter>
+	<summary height="45">
+		<element kind="staticText" uuid="182c7b3f-f282-4609-b35e-76e70089e199" x="280" y="0" width="164" height="45" fontSize="14.0">
+			<text><![CDATA[Total de órdenes activas:]]></text>
+		</element>
+		<element kind="textField" uuid="7c132e04-7054-4336-8ff8-6035b0ba0f1a" x="444" y="0" width="111" height="30" fontSize="14.0">
+			<expression><![CDATA[$V{REPORT_COUNT}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</summary>
+</jasperReport>

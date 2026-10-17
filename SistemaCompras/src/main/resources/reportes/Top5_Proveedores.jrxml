@@ -1,0 +1,106 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="Top5_Proveedores" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d1e41f8c-e087-4fab-83de-26f7c86b37a7">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<parameter name="FechaInicio" class="java.sql.Date"/>
+	<parameter name="FechaFin" class="java.sql.Date"/>
+	<query language="SQL"><![CDATA[SELECT TOP 5
+    p.nombreComercial AS Proveedor,
+    COUNT(ad.AdjudicacionID) AS Pedidos,
+    SUM(ad.cantidadFinal * ad.precioAcordado) AS Monto
+FROM Adjudicacion_Detalle ad
+INNER JOIN Adjudicacion adj ON ad.AdjudicacionID = adj.AdjudicacionID
+INNER JOIN Proveedor p ON ad.ProveedorID = p.ProveedorID
+WHERE adj.fechaResolucion BETWEEN $P{FechaInicio} AND $P{FechaFin}
+GROUP BY p.nombreComercial
+ORDER BY Monto DESC;]]></query>
+	<field name="Proveedor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Proveedor"/>
+		<property name="com.jaspersoft.studio.field.label" value="Proveedor"/>
+	</field>
+	<field name="Pedidos" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Pedidos"/>
+		<property name="com.jaspersoft.studio.field.label" value="Pedidos"/>
+	</field>
+	<field name="Monto" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="Monto"/>
+		<property name="com.jaspersoft.studio.field.label" value="Monto"/>
+	</field>
+	<variable name="SumaTotal" calculation="Sum" class="java.math.BigDecimal">
+		<expression><![CDATA[$F{Monto}]]></expression>
+	</variable>
+	<background/>
+	<title height="76">
+		<element kind="frame" uuid="91850cae-a0b4-4a02-bb05-bb10be09388c" x="-20" y="-20" width="595" height="92" backcolor="#006699" mode="Opaque">
+			<element kind="staticText" uuid="8535abb1-0ee6-418a-bffc-4ab201d9b582" x="0" y="20" width="595" height="43" forecolor="#FFFFFF" fontSize="22.0" bold="true" hTextAlign="Center">
+				<text><![CDATA[TOP 5 PROVEEDORES POR MONTO ADJUDICADO]]></text>
+			</element>
+			<element kind="textField" uuid="67b68a36-333e-43f5-a4e3-2e22fbb01136" x="0" y="50" width="595" height="30" forecolor="#FFFFFF" mode="Transparent" fontSize="14.0" hTextAlign="Center">
+				<expression><![CDATA["Rango: " + $P{FechaInicio} + " al " + $P{FechaFin}]]></expression>
+			</element>
+		</element>
+	</title>
+	<pageHeader height="13"/>
+	<columnHeader height="24">
+		<element kind="line" uuid="76289b5d-914a-4452-b830-cfadbc1b66dd" x="-20" y="20" width="595" height="1" forecolor="#666666"/>
+		<element kind="staticText" uuid="6758ac55-a571-4a75-a65d-badd41c18126" x="140" y="0" width="140" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" positionType="FixRelativeToBottom" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<text><![CDATA[Proveedor]]></text>
+		</element>
+		<element kind="staticText" uuid="178d3030-ec62-4a4b-bc2a-26be4ab620f1" x="280" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" positionType="FixRelativeToBottom" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<text><![CDATA[Pedidos]]></text>
+		</element>
+		<element kind="staticText" uuid="84b59a6a-871d-4136-8349-85083b7f395e" x="417" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" positionType="FixRelativeToBottom" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<text><![CDATA[Monto Total]]></text>
+		</element>
+		<element kind="staticText" uuid="91a7a1ee-b565-4505-89df-a48c9caeb641" x="2" y="0" width="138" height="20" forecolor="#006699" backcolor="#E6E6E6" mode="Opaque" positionType="FixRelativeToBottom" fontSize="14.0" bold="true" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<text><![CDATA[#]]></text>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</columnHeader>
+	<detail>
+		<band height="22">
+			<element kind="line" uuid="2de80115-97a3-4118-88be-c26a28e14271" x="0" y="19" width="555" height="1" positionType="FixRelativeToBottom"/>
+			<element kind="textField" uuid="e8f7b533-c83f-40ca-a8c9-128681966495" x="3" y="-3" width="137" height="23" fontSize="14.0" hTextAlign="Center">
+				<expression><![CDATA[$V{REPORT_COUNT}]]></expression>
+			</element>
+			<element kind="textField" uuid="e09626a8-6aed-496d-97e3-21f9e8bc6d50" x="140" y="0" width="140" height="19" fontSize="14.0" hTextAlign="Center">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8c46b3c9-efbb-4876-bd22-c2faaa18a0dd"/>
+				<expression><![CDATA[$F{Proveedor}]]></expression>
+			</element>
+			<element kind="textField" uuid="30dd215f-9d18-4e30-b166-4bfd62d028f5" x="280" y="0" width="138" height="19" fontSize="14.0" hTextAlign="Right">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b0d50825-e17a-4538-a9c6-a84908788311"/>
+				<expression><![CDATA[$F{Pedidos}]]></expression>
+			</element>
+			<element kind="textField" uuid="4f522dd7-f409-4bc0-b5a9-ede8cc928bcc" x="419" y="0" width="136" height="19" fontSize="14.0" pattern="Q #,##0.00" hTextAlign="Right">
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ee863aba-2651-4cb7-86df-a0a10fca9a43"/>
+				<expression><![CDATA[$F{Monto}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter/>
+	<pageFooter height="13">
+		<element kind="textField" uuid="b67f0784-ced6-4fa0-8c4c-02fe1e1c6089" x="0" y="0" width="515" height="13" backcolor="#E6E6E6" mode="Opaque" hTextAlign="Right">
+			<expression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></expression>
+		</element>
+		<element kind="textField" uuid="6817ba66-7cad-4ffe-b6ac-322f58db1d3e" x="0" y="0" width="100" height="13" pattern="EEEEE dd MMMMM yyyy">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+		<element kind="textField" uuid="03442fdb-11d8-4b92-a72c-9f2999e2e8d5" x="515" y="0" width="40" height="13" backcolor="#E6E6E6" mode="Opaque" evaluationTime="Report">
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</pageFooter>
+	<summary height="30">
+		<element kind="staticText" uuid="c081f836-f34b-4eaf-9ac5-ab6500f52a02" x="280" y="0" width="137" height="30" fontSize="14.0" hTextAlign="Right">
+			<text><![CDATA[Total Adjudicado:]]></text>
+		</element>
+		<element kind="textField" uuid="bbc993e7-3e95-46fa-b8f4-85a83f5f3702" x="419" y="0" width="136" height="30" fontSize="14.0" pattern="Q #,##0.00" hTextAlign="Right">
+			<expression><![CDATA[$V{SumaTotal}]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</summary>
+</jasperReport>
