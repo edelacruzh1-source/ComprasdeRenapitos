@@ -1,14 +1,34 @@
 package com.sistemacompras.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+
 import com.sistemacompras.datos.IConexionBD;
 import com.sistemacompras.entidades.Usuario;
 import com.sistemacompras.ui.reportes.AnalisisOfertasPanel;
 import com.sistemacompras.ui.reportes.EficienciaCompraPanel;
 import com.sistemacompras.ui.reportes.GastoDepartamentalPanel;
 import com.sistemacompras.ui.reportes.HistorialComprasPanel;
+import com.sistemacompras.ui.reportes.OrdenesActivasPanel;
+import com.sistemacompras.ui.reportes.PedidosPendientesPanel;
+import com.sistemacompras.ui.reportes.RankingProveedoresPanel;
+import com.sistemacompras.ui.reportes.VariacionPreciosPanel;
 
-import javax.swing.*;
-import java.awt.*;
 
 public class MenuPrincipalPanel extends JPanel {
 
@@ -94,6 +114,10 @@ public class MenuPrincipalPanel extends JPanel {
         	agregarBotonMenu(menuLateral, "Eficiencia de Compra", () -> abrirPanel("reporte_eficiencia"));
         	agregarBotonMenu(menuLateral, "Gasto Departamental", () -> abrirPanel("reporte_gasto"));
         	agregarBotonMenu(menuLateral, "Historial de Compras", () -> abrirPanel("reporte_historial"));
+        	agregarBotonMenu(menuLateral, "Ordenes Activas", ()-> abrirPanel("reporte_ordenes_activas"));
+        	agregarBotonMenu(menuLateral, "Pedidos Pendientes", ()-> abrirPanel("reporte_pedidos_pendientes"));
+        	agregarBotonMenu(menuLateral, "Top 5 Proveedores", ()->abrirPanel("reporte_top5"));
+        	agregarBotonMenu(menuLateral, "Variacion de Precios", ()->abrirPanel("reporte_variacion"));
         }
         
         
@@ -207,6 +231,10 @@ public class MenuPrincipalPanel extends JPanel {
                 case "reporte_eficiencia" -> new EficienciaCompraPanel(conexion);
                 case "reporte_gasto" -> new GastoDepartamentalPanel(conexion);
                 case "reporte_historial" -> new HistorialComprasPanel(conexion);
+                case "reporte_ordenes_activas" -> new OrdenesActivasPanel(conexion);
+                case "reporte_pedidos_pendientes" -> new PedidosPendientesPanel(conexion);
+                case "reporte_top5" -> new RankingProveedoresPanel(conexion);
+                case "reporte_variacion" -> new VariacionPreciosPanel(conexion);
                 default -> new JPanel();
             };
         } catch (Exception e) {

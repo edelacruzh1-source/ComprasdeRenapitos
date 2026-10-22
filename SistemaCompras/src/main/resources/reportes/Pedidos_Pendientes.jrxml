@@ -139,7 +139,7 @@ ORDER BY p.fechaSolicitud;]]></query>
 			<text><![CDATA[Total de pedidos pendientes:]]></text>
 		</element>
 		<element kind="textField" uuid="8f2bd01f-b11e-4bf1-aa44-97dcf6137a68" x="425" y="0" width="130" height="30" fontSize="14.0">
-			<expression><![CDATA[$V{PAGE_COUNT} ]]></expression>
+			<expression><![CDATA[$V{REPORT_COUNT} ]]></expression>
 		</element>
 	</summary>
 </jasperReport>
