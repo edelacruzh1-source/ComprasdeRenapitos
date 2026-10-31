@@ -4,6 +4,7 @@ import com.sistemacompras.datos.IConexionBD;
 import com.sistemacompras.entidades.Sucursal;
 import com.sistemacompras.repositorios.SucursalRepositorio;
 import com.sistemacompras.repositorios.reportes.GastoDepartamentalRepositorio;
+import com.sistemacompras.repositorios.reportes.ReporteExporter;
 
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.swing.JRViewer;
@@ -76,6 +77,29 @@ public class GastoDepartamentalPanel extends JPanel {
         btnGenerar.addActionListener(e -> generarReporte());
         barraControles.add(btnGenerar);
 
+        // ===== BOTONES DE EXPORTAR =====
+        JButton btnPDF = new JButton("📄 PDF");
+        btnPDF.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnPDF.setForeground(Color.WHITE);
+        btnPDF.setBackground(new Color(220, 53, 69));
+        btnPDF.setFocusPainted(false);
+        btnPDF.setBorderPainted(false);
+        btnPDF.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnPDF.setPreferredSize(new Dimension(100, 30));
+        btnPDF.addActionListener(e -> exportarReporte("PDF"));
+        barraControles.add(btnPDF);
+
+        JButton btnExcel = new JButton("📊 Excel");
+        btnExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnExcel.setForeground(Color.WHITE);
+        btnExcel.setBackground(new Color(25, 135, 84));
+        btnExcel.setFocusPainted(false);
+        btnExcel.setBorderPainted(false);
+        btnExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExcel.setPreferredSize(new Dimension(100, 30));
+        btnExcel.addActionListener(e -> exportarReporte("Excel"));
+        barraControles.add(btnExcel);
+
         panelSuperior.add(lblTitulo);
         panelSuperior.add(Box.createVerticalStrut(10));
         panelSuperior.add(barraControles);
@@ -130,7 +154,6 @@ public class GastoDepartamentalPanel extends JPanel {
         }
 
         try {
-            // ✅ CORREGIDO: sucursal.getSucursalID() en vez de sucursalID
             JasperPrint jasperPrint = repo.generarReporte(sucursal.getSucursalID(), anio);
 
             boolean hayDatos = !jasperPrint.getPages().isEmpty()
@@ -159,6 +182,46 @@ public class GastoDepartamentalPanel extends JPanel {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
                 "Error al generar reporte: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void exportarReporte(String formato) {
+        try {
+            Sucursal sucursal = (Sucursal) cboSucursal.getSelectedItem();
+            Integer anio = (Integer) cboAnio.getSelectedItem();
+
+            if (sucursal == null || anio == null) {
+                JOptionPane.showMessageDialog(this, "Selecciona sucursal y año");
+                return;
+            }
+
+            JasperPrint jasperPrint = repo.generarReporte(sucursal.getSucursalID(), anio);
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar reporte como " + formato);
+            String extension = formato.equals("PDF") ? ".pdf" : ".xlsx";
+            fileChooser.setSelectedFile(new java.io.File("Reporte_Gasto" + extension));
+
+            int resultado = fileChooser.showSaveDialog(this);
+            if (resultado != JFileChooser.APPROVE_OPTION) return;
+
+            java.io.File archivo = fileChooser.getSelectedFile();
+
+            if (formato.equals("PDF")) {
+                ReporteExporter.exportarPDF(jasperPrint, archivo);
+            } else {
+                ReporteExporter.exportarExcel(jasperPrint, archivo);
+            }
+
+            JOptionPane.showMessageDialog(this,
+                "Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Error al exportar: " + e.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

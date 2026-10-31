@@ -14,6 +14,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,6 +25,7 @@ import com.sistemacompras.entidades.Articulo;
 import com.sistemacompras.entidades.Proveedor;
 import com.sistemacompras.repositorios.ArticuloRepositorio;
 import com.sistemacompras.repositorios.ProveedorRepositorio;
+import com.sistemacompras.repositorios.reportes.ReporteExporter;
 import com.sistemacompras.repositorios.reportes.VariacionPreciosRepositorio;
 
 import net.sf.jasperreports.engine.JasperPrint;
@@ -31,7 +33,7 @@ import net.sf.jasperreports.swing.JRViewer;
 
 public class VariacionPreciosPanel extends JPanel {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private final VariacionPreciosRepositorio repo;
     private final ArticuloRepositorio articuloRepo;
     private final ProveedorRepositorio proveedorRepo;
@@ -97,6 +99,29 @@ public class VariacionPreciosPanel extends JPanel {
         btnGenerar.setPreferredSize(new Dimension(150, 30));
         btnGenerar.addActionListener(e -> generarReporte());
         barraControles.add(btnGenerar);
+
+        // ===== BOTONES DE EXPORTAR =====
+        JButton btnPDF = new JButton("📄 PDF");
+        btnPDF.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnPDF.setForeground(Color.WHITE);
+        btnPDF.setBackground(new Color(220, 53, 69));
+        btnPDF.setFocusPainted(false);
+        btnPDF.setBorderPainted(false);
+        btnPDF.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnPDF.setPreferredSize(new Dimension(100, 30));
+        btnPDF.addActionListener(e -> exportarReporte("PDF"));
+        barraControles.add(btnPDF);
+
+        JButton btnExcel = new JButton("📊 Excel");
+        btnExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnExcel.setForeground(Color.WHITE);
+        btnExcel.setBackground(new Color(25, 135, 84));
+        btnExcel.setFocusPainted(false);
+        btnExcel.setBorderPainted(false);
+        btnExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExcel.setPreferredSize(new Dimension(100, 30));
+        btnExcel.addActionListener(e -> exportarReporte("Excel"));
+        barraControles.add(btnExcel);
 
         panelSuperior.add(lblTitulo);
         panelSuperior.add(Box.createVerticalStrut(10));
@@ -186,4 +211,47 @@ public class VariacionPreciosPanel extends JPanel {
         }
     }
 
+    private void exportarReporte(String formato) {
+        try {
+            Articulo articulo = (Articulo) cboArticulo.getSelectedItem();
+            Proveedor proveedor = (Proveedor) cboProveedor.getSelectedItem();
+
+            if (articulo == null || proveedor == null) {
+                JOptionPane.showMessageDialog(this,
+                    "Selecciona un artículo y un proveedor");
+                return;
+            }
+
+            JasperPrint jasperPrint = repo.generarReporte(
+                articulo.getArticuloID(),
+                proveedor.getProveedorID()
+            );
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar reporte como " + formato);
+            String extension = formato.equals("PDF") ? ".pdf" : ".xlsx";
+            fileChooser.setSelectedFile(new java.io.File("Reporte_Variacion" + extension));
+
+            int resultado = fileChooser.showSaveDialog(this);
+            if (resultado != JFileChooser.APPROVE_OPTION) return;
+
+            java.io.File archivo = fileChooser.getSelectedFile();
+
+            if (formato.equals("PDF")) {
+                ReporteExporter.exportarPDF(jasperPrint, archivo);
+            } else {
+                ReporteExporter.exportarExcel(jasperPrint, archivo);
+            }
+
+            JOptionPane.showMessageDialog(this,
+                "Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Error al exportar: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }

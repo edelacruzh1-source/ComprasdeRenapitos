@@ -4,6 +4,7 @@ import com.sistemacompras.datos.IConexionBD;
 import com.sistemacompras.entidades.OrdenCompra;
 import com.sistemacompras.repositorios.OrdenCompraRepositorio;
 import com.sistemacompras.repositorios.reportes.AnalisisOfertasRepositorio;
+import com.sistemacompras.repositorios.reportes.ReporteExporter;
 
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.swing.JRViewer;
@@ -70,13 +71,36 @@ public class AnalisisOfertasPanel extends JPanel {
         btnGenerar.setPreferredSize(new Dimension(150, 30));
         btnGenerar.addActionListener(e -> generarReporte());
         barraControles.add(btnGenerar);
+        
+     // Botón Exportar PDF
+        JButton btnPDF = new JButton("📄 PDF");
+        btnPDF.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnPDF.setForeground(Color.WHITE);
+        btnPDF.setBackground(new Color(220, 53, 69));
+        btnPDF.setFocusPainted(false);
+        btnPDF.setBorderPainted(false);
+        btnPDF.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnPDF.setPreferredSize(new Dimension(100, 30));
+        btnPDF.addActionListener(e -> exportarReporte("PDF"));
+        barraControles.add(btnPDF);
+
+        // Botón Exportar Excel
+        JButton btnExcel = new JButton("📊 Excel");
+        btnExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnExcel.setForeground(Color.WHITE);
+        btnExcel.setBackground(new Color(25, 135, 84));
+        btnExcel.setFocusPainted(false);
+        btnExcel.setBorderPainted(false);
+        btnExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExcel.setPreferredSize(new Dimension(100, 30));
+        btnExcel.addActionListener(e -> exportarReporte("Excel"));
+        barraControles.add(btnExcel);
 
         // Armar el panel superior
         panelSuperior.add(lblTitulo);
         panelSuperior.add(Box.createVerticalStrut(10));
         panelSuperior.add(barraControles);
 
-        add(panelSuperior, BorderLayout.NORTH);
 
         // ===== PANEL DEL REPORTE =====
         panelReporte = new JPanel(new BorderLayout());
@@ -92,7 +116,11 @@ public class AnalisisOfertasPanel extends JPanel {
         lblMensaje.setForeground(new Color(108, 117, 125));
         panelReporte.add(lblMensaje, BorderLayout.CENTER);
 
-        add(panelReporte, BorderLayout.CENTER);
+        
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panelSuperior, panelReporte);
+        split.setResizeWeight(0.2); // 20% para la barra superior, 80% para el reporte
+        split.setBorder(null);
+        add(split, BorderLayout.CENTER);
     }
 
     private void cargarOrdenes() {
@@ -128,6 +156,50 @@ public class AnalisisOfertasPanel extends JPanel {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
                 "Error al generar reporte: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void exportarReporte(String formato) {
+        try {
+            // Obtener la orden seleccionada del combo
+            com.sistemacompras.entidades.OrdenCompra orden =
+                (com.sistemacompras.entidades.OrdenCompra) cboOrden.getSelectedItem();
+
+            if (orden == null) {
+                JOptionPane.showMessageDialog(this, "Selecciona una orden");
+                return;
+            }
+
+            // Generar el JasperPrint con el OrdenID
+            JasperPrint jasperPrint = repo.generarReporte(orden.getOrdenID());
+
+            // Pedir al usuario dónde guardar
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar reporte como " + formato);
+            String extension = formato.equals("PDF") ? ".pdf" : ".xlsx";
+            fileChooser.setSelectedFile(new java.io.File("Reporte_Ofertas" + extension));
+
+            int resultado = fileChooser.showSaveDialog(this);
+            if (resultado != JFileChooser.APPROVE_OPTION) return;
+
+            java.io.File archivo = fileChooser.getSelectedFile();
+
+            // Exportar según el formato
+            if (formato.equals("PDF")) {
+                ReporteExporter.exportarPDF(jasperPrint, archivo);
+            } else {
+                ReporteExporter.exportarExcel(jasperPrint, archivo);
+            }
+
+            JOptionPane.showMessageDialog(this,
+                "Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Error al exportar: " + e.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

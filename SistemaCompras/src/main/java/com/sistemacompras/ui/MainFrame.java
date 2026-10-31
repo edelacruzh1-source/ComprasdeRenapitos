@@ -13,6 +13,7 @@ public class MainFrame extends JFrame {
         setTitle("Sistema de Gestión de Adquisiciones y Proveedores");
         setSize(1000, 680);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(900, 620));
 

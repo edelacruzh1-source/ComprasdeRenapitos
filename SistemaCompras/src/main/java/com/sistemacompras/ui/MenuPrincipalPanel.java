@@ -21,6 +21,7 @@ import javax.swing.SwingConstants;
 import com.sistemacompras.datos.IConexionBD;
 import com.sistemacompras.entidades.Usuario;
 import com.sistemacompras.ui.reportes.AnalisisOfertasPanel;
+import com.sistemacompras.ui.reportes.DashboardPanel;
 import com.sistemacompras.ui.reportes.EficienciaCompraPanel;
 import com.sistemacompras.ui.reportes.GastoDepartamentalPanel;
 import com.sistemacompras.ui.reportes.HistorialComprasPanel;
@@ -118,6 +119,7 @@ public class MenuPrincipalPanel extends JPanel {
         	agregarBotonMenu(menuLateral, "Pedidos Pendientes", ()-> abrirPanel("reporte_pedidos_pendientes"));
         	agregarBotonMenu(menuLateral, "Top 5 Proveedores", ()->abrirPanel("reporte_top5"));
         	agregarBotonMenu(menuLateral, "Variacion de Precios", ()->abrirPanel("reporte_variacion"));
+        	agregarBotonMenu(menuLateral, "Dashboard", () -> abrirPanel("dashboard"));
         }
         
         
@@ -235,6 +237,7 @@ public class MenuPrincipalPanel extends JPanel {
                 case "reporte_pedidos_pendientes" -> new PedidosPendientesPanel(conexion);
                 case "reporte_top5" -> new RankingProveedoresPanel(conexion);
                 case "reporte_variacion" -> new VariacionPreciosPanel(conexion);
+                case "dashboard" -> new DashboardPanel(conexion);
                 default -> new JPanel();
             };
         } catch (Exception e) {
