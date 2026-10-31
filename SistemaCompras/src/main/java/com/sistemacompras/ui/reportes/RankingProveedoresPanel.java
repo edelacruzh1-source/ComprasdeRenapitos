@@ -28,7 +28,7 @@ import net.sf.jasperreports.swing.JRViewer;
 
 public class RankingProveedoresPanel extends JPanel {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private final RankingProveedoresRepositorio repo;
 
     private JSpinner spnFechaInicio;
@@ -55,7 +55,6 @@ public class RankingProveedoresPanel extends JPanel {
         lblTitulo.setForeground(new Color(33, 37, 41));
         lblTitulo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Barra de controles
         JPanel barraControles = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         barraControles.setBackground(Color.WHITE);
         barraControles.setBorder(BorderFactory.createCompoundBorder(
@@ -64,14 +63,12 @@ public class RankingProveedoresPanel extends JPanel {
         ));
         barraControles.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Fecha inicio
         barraControles.add(new JLabel("Fecha inicio:"));
         spnFechaInicio = crearSpinnerFecha(LocalDate.of(2026, 1, 1));
         barraControles.add(spnFechaInicio);
 
         barraControles.add(Box.createHorizontalStrut(15));
 
-        // Fecha fin
         barraControles.add(new JLabel("Fecha fin:"));
         spnFechaFin = crearSpinnerFecha(LocalDate.of(2026, 12, 31));
         barraControles.add(spnFechaFin);
@@ -95,7 +92,6 @@ public class RankingProveedoresPanel extends JPanel {
 
         add(panelSuperior, BorderLayout.NORTH);
 
-        // ===== PANEL DEL REPORTE =====
         panelReporte = new JPanel(new BorderLayout());
         panelReporte.setBackground(Color.WHITE);
         panelReporte.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230)));
@@ -110,28 +106,19 @@ public class RankingProveedoresPanel extends JPanel {
         add(panelReporte, BorderLayout.CENTER);
     }
 
-    /**
-     * Crea un JSpinner de fecha (DateModel con LocalDate).
-     */
     private JSpinner crearSpinnerFecha(LocalDate fechaInicial) {
         SpinnerDateModel model = new SpinnerDateModel();
         JSpinner spinner = new JSpinner(model);
-
-        // Formato de fecha: yyyy-MM-dd
         JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd");
         spinner.setEditor(editor);
-
-        // Convertir LocalDate a java.util.Date para el modelo
         java.sql.Date fechaSql = java.sql.Date.valueOf(fechaInicial);
         spinner.setValue(new java.util.Date(fechaSql.getTime()));
-
         spinner.setPreferredSize(new Dimension(130, 28));
         return spinner;
     }
 
     private void generarReporte() {
         try {
-            // Obtener fechas del spinner
             java.util.Date fechaIniUtil = (java.util.Date) spnFechaInicio.getValue();
             java.util.Date fechaFinUtil = (java.util.Date) spnFechaFin.getValue();
 
@@ -176,5 +163,4 @@ public class RankingProveedoresPanel extends JPanel {
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-	
 }

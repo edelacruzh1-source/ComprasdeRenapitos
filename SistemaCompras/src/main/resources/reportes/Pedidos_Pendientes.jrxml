@@ -11,11 +11,11 @@
     p.cantidad,
     p.fechaSolicitud,
     p.fechaNecesidad
-FROM dbo.Pedido_Interno p
-INNER JOIN dbo.Departamento d ON p.DepartamentoID = d.DepartamentoID
-INNER JOIN dbo.Sucursal s ON d.SucursalID = s.SucursalID
-INNER JOIN dbo.Articulo a ON p.ArticuloID = a.ArticuloID
-LEFT JOIN dbo.Orden_Pedido op ON p.PedidoID = op.PedidoID
+FROM Pedido_Interno p
+INNER JOIN Departamento d ON p.DepartamentoID = d.DepartamentoID
+INNER JOIN Sucursal s ON d.SucursalID = s.SucursalID
+INNER JOIN Articulo a ON p.ArticuloID = a.ArticuloID
+LEFT JOIN Orden_Pedido op ON p.PedidoID = op.PedidoID
 WHERE op.PedidoID IS NULL
 ORDER BY p.fechaSolicitud;]]></query>
 	<field name="PedidoID" class="java.lang.Integer">

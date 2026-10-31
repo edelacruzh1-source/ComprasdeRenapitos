@@ -1,19 +1,19 @@
 package com.sistemacompras.repositorios.reportes;
 
+import com.sistemacompras.datos.IConexionBD;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sistemacompras.datos.IConexionBD;
-
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-
 public class RankingProveedoresRepositorio {
+
     private final IConexionBD conexion;
 
     public RankingProveedoresRepositorio(IConexionBD conexion) {
@@ -22,12 +22,18 @@ public class RankingProveedoresRepositorio {
 
     public JasperPrint generarReporte(java.time.LocalDate fechaInicio,
                                       java.time.LocalDate fechaFin) throws Exception {
+
+        // Elegir el .jrxml según el gestor activo
+        String archivo = conexion.getNombreGestor().equals("MySQL")
+            ? "reportes/Top5_Proveedores_MySQL.jrxml"
+            : "reportes/Top5_Proveedores_SQLServer.jrxml";
+
         InputStream jrxmlStream = getClass()
             .getClassLoader()
-            .getResourceAsStream("reportes/Top5_Proveedores.jrxml");
+            .getResourceAsStream(archivo);
 
         if (jrxmlStream == null) {
-            throw new RuntimeException("No se encontró reportes/Top5_Proveedores.jrxml");
+            throw new RuntimeException("No se encontró " + archivo);
         }
 
         JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
@@ -40,5 +46,4 @@ public class RankingProveedoresRepositorio {
             return JasperFillManager.fillReport(jasperReport, parametros, conn);
         }
     }
-
 }
