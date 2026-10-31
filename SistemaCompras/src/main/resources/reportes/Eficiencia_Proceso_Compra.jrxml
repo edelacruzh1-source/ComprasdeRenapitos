@@ -2,14 +2,7 @@
 <jasperReport name="Eficiencia_Proceso_Compra" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b5602267-73e7-451d-bd07-fec4ee63865f">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
-	<query language="SQL"><![CDATA[SELECT 
-    o.OrdenID,
-    o.descripcion AS Orden,
-    o.fechaCreacion,
-    adj.fechaResolucion,
-    DATEDIFF(DAY, o.fechaCreacion, adj.fechaResolucion) AS DiasTranscurridos
-FROM Orden_Compra o
-INNER JOIN Adjudicacion adj ON o.OrdenID = adj.OrdenID
+	<query language="SQL"><![CDATA[SELECT * FROM Vista_EficienciaCompra
 ORDER BY DiasTranscurridos DESC;]]></query>
 	<field name="OrdenID" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="OrdenID"/>

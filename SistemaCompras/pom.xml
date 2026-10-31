@@ -5,6 +5,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.sistemacompras</groupId>
     <artifactId>SistemaCompras</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -23,11 +24,6 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>12.6.1.jre11</version>
         </dependency>
-        <dependency>
-    		<groupId>net.sf.jasperreports</groupId>
-    		<artifactId>jasperreports</artifactId>
-    		<version>7.0.3</version> <!-- Usa la versión más reciente estable -->
-		</dependency>
 
         <!-- MySQL -->
         <dependency>
@@ -35,45 +31,45 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>8.4.0</version>
         </dependency>
-<!-- JasperReports -->
-<dependency>
-    <groupId>net.sf.jasperreports</groupId>
-    <artifactId>jasperreports</artifactId>
-    <version>7.0.3</version>
-</dependency>
 
-<!-- Para exportar a PDF (opcional pero recomendado) -->
-<dependency>
-    <groupId>com.lowagie</groupId>
-    <artifactId>itext</artifactId>
-    <version>2.1.7</version>
-</dependency>
-
-<!-- Para compilar .jrxml a .jasper en tiempo de ejecución -->
-<dependency>
-    <groupId>org.eclipse.jdt</groupId>
-    <artifactId>ecj</artifactId>
-    <version>3.33.0</version>
-</dependency>
         <!-- BCrypt -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
+
+        <!-- JasperReports -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
+        <!-- iText (para exportar a PDF desde Jasper) -->
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+        </dependency>
+
+        <!-- ECJ (compilador para JasperReports en runtime) -->
+        <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>ecj</artifactId>
+            <version>3.33.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-        
-            <!-- Compilador -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
             </plugin>
 
-            <!-- JAR ejecutable -->
+            <!-- Plugin para generar el Fat JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -88,9 +84,20 @@
                             <transformers>
                                 <transformer implementation=
                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.sistemacompras.ui.LoginForm</mainClass>
+                                    <!-- Clase Main de tu proyecto -->
+                                    <mainClass>com.sistemacompras.ui.MainFrame</mainClass>
                                 </transformer>
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
